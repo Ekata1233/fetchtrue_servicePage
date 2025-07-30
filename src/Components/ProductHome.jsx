@@ -7,6 +7,8 @@ import HitW from "./HitW";
 import ProductDeatils from "./ProductDeatils";
 import TandC from "./TandC";
 import WhyBizBooster from "./WhyBizBooster";
+import Benifits from "./Benifits";
+import Highlight from "./Highlight";
 
 function ProductHome() {
   const [showReview] = useState(false); // State to toggle review page
@@ -17,7 +19,9 @@ return (
   <div>
     {/* <Carousell /> */}
     <ProductDeatils />
+    <Benifits/>
     <Description setDiscountedPrice={setDiscountedPrice} /> 
+    <Highlight/>
     <WhyBizBooster/>
     <Document />
     <TandC />
