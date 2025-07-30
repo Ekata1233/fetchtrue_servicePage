@@ -114,7 +114,7 @@ export default function SelfAddPage() {
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [inputCoupon, setInputCoupon] = useState('');
   const [termsAgreed, setTermsAgreed] = useState(false);
-
+const trueAssurityCharges = 17; 
   const handleNext = () => {
     if (activeStep === 0 && (!formSaved || !termsAgreed)) return;
     setActiveStep((prev) => prev + 1);
@@ -139,6 +139,7 @@ export default function SelfAddPage() {
           {!formSaved ? (
             <Form style={{ border: '1px solid #ccc', borderRadius: '8px' }} className=''>
               <div className='p-3'>
+                <h3 className=' #00509D'>Customer Details</h3>
                 <Row className="mb-3 ">
                 <Col md={6}>
                   <Form.Group controlId="name">
@@ -272,17 +273,57 @@ export default function SelfAddPage() {
           </Box>
 
           {/* Checkout Summary */}
-          <Box sx={{ mt: 4, p: 3, border: '1px solid #ccc', borderRadius: 2 }}>
-           
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}><span>Main Price (15%)</span><span>₹1000</span></Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}><span>Discounted Price</span><span>₹850</span></Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}><span>Service Discount (10%)</span><span>- ₹85</span></Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}><span>Coupon Discount ({appliedCoupon?.percent || 0}%)</span><span>- ₹{appliedCoupon ? ((850 * appliedCoupon.percent) / 100).toFixed(2) : '0.00'}</span></Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}><span>Service GST (18%)</span><span>₹153</span></Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}><span>Platform Fee</span><span>₹30</span></Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}><span>True Assurity Charges (2%)</span><span>₹17</span></Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #ccc', pt: 2 }}><Typography variant="h6">Grand Total</Typography><Typography variant="h6">₹{(() => {const base = 850;const serviceDiscount = base * 0.1;const couponDiscount = appliedCoupon ? (base * appliedCoupon.percent) / 100 : 0;const total = base - serviceDiscount - couponDiscount + 153 + 30 + 17;return total.toFixed(2);})()}</Typography></Box>
-          </Box>
+        <Box sx={{ mt: 4, p: 3, border: '1px solid #ccc', borderRadius: 2 }}>
+  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+    <span>Listing Price (15%)</span>
+    <span>₹1000</span>
+  </Box>
+
+  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+    <span>Service Discount (10%)</span>
+    <span>- ₹100</span>
+  </Box>
+
+  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+    <span>Price After Discount</span>
+    <span>₹900</span>
+  </Box>
+
+  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+    <span>Coupon Discount ({appliedCoupon?.percent || 0}%)</span>
+    <span>- ₹{appliedCoupon ? ((900 * appliedCoupon.percent) / 100).toFixed(2) : '0.00'}</span>
+  </Box>
+
+  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+    <span>Service GST (18%)</span>
+    <span>₹153</span>
+  </Box>
+
+  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+    <span>Platform Fee ( ₹ )</span>
+    <span>₹30</span>
+  </Box>
+
+  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+    <span>True Assurity Charges (2%)</span>
+    <span>₹{trueAssurityCharges}</span>
+  </Box>
+
+  <Box sx={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #ccc', pt: 2 }}>
+    <Typography variant="h6">Grand Total</Typography>
+    <Typography variant="h6">
+      ₹{(() => {
+        const base = 1000;
+        const serviceDiscount = base * 0.1;
+        const afterServiceDiscount = base - serviceDiscount;
+        const couponDiscount = appliedCoupon ? (afterServiceDiscount * appliedCoupon.percent) / 100 : 0;
+        const total = afterServiceDiscount - couponDiscount + 153 + 30 + (trueAssurityCharges || 0);
+        return total.toFixed(2);
+      })()}
+    </Typography>
+  </Box>
+</Box>
+
 
           {/* Terms & Proceed */}
           <Form.Check
