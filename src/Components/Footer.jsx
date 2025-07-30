@@ -10,10 +10,10 @@ function Footer() {
         <div className="w-100 blue-bg text-white mt-5">
            <Container className="py-4">
            <h2 className="fw-bold mb-3">For More Information</h2>
-           <p className=""> <FiMail className="me-2" style={{width:"20px", height:"20px"}}/>info@bizbooster2x.com</p>
+           <p className=""> <FiMail className="me-2" style={{width:"20px", height:"20px"}}/>info@fetchtrue.com</p>
            <p className=""> <FaPhoneAlt className="me-2" style={{width:"20px", height:"20px"}}/>+91 9309517500</p>
 
-           <p className=""> <TbWorld className="me-2" style={{width:"20px", height:"20px"}}/> www.bizbooster2x.com.</p>
+           <p className=""> <TbWorld className="me-2" style={{width:"20px", height:"20px"}}/> www.fetchtrue.com.</p>
 
            <div className="mt-2">
               

@@ -3,7 +3,7 @@ function ProductHeader() {
     <div>
         
         <div className="relative blue-bg">
-        <h2 className="text-white pt-5 ps-5">Bizbooster2X</h2>
+        <h2 className="text-white pt-5 ps-5">Fetch True .</h2>
 
         {/* Bottom Wave SVG with Reduced Height */}
         <svg

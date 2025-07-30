@@ -18,11 +18,13 @@ return (
     {/* <Carousell /> */}
     <ProductDeatils />
     <Description setDiscountedPrice={setDiscountedPrice} /> 
+    <WhyBizBooster/>
     <Document />
     <TandC />
     <HitW />
-    <FAQs />
-    <WhyBizBooster />
+   
+   
+     <FAQs />
     {/* <Contact/> */}
   </div>
   );
