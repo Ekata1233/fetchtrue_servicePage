@@ -22,16 +22,14 @@ function App() {
         <Header />
         <Routes>
           <Route path="/" element={<ProductHome />} />
-          <Route path="/description" element={<Description />} />
           <Route path="/review" element={<Review />} />
           <Route path="/writeareview" element={<WriteReview />} />
           <Route path="/self-add" element={<SelfAddPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/return-policy" element={<ReturnRefund />} />
-          <Route path="/terms&conditons" element={<TermsConditions />} />
-                    <Route path="/cancellation-policy" element={<CancellationPolicy />} />
-                    <Route path="/about-us" element={<Aboutus />} />
-
+          <Route path="/terms-and-conditions" element={<TermsConditions />} />
+          <Route path="/cancellation-policy" element={<CancellationPolicy />} />
+          <Route path="/about-us" element={<Aboutus />} />
         </Routes>
         <Footer />
       </ApiProvider>

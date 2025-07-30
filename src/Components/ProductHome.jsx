@@ -11,6 +11,7 @@ import Benifits from "./Benifits";
 import Highlight from "./Highlight";
 
 function ProductHome() {
+  
   const [showReview] = useState(false); // State to toggle review page
 console.log("showReview", showReview)
 const [discountedPrice, setDiscountedPrice] = useState(null); // State to store price from Description
@@ -20,7 +21,7 @@ return (
     {/* <Carousell /> */}
     <ProductDeatils />
     <Benifits/>
-    <Description setDiscountedPrice={setDiscountedPrice} /> 
+    <Description /> 
     <Highlight/>
     <WhyBizBooster/>
     <Document />
