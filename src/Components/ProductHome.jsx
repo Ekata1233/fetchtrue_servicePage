@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Contact from "./Contact";
-import Description from "./Description";
+import Description from "./Overview";
 import Document from "./Document";
 import FAQs from "./FAQs";
 import HitW from "./HitW";

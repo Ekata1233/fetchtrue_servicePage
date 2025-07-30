@@ -2,7 +2,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css'
 import { ApiProvider } from './Components/ApiContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Description from './Components/Description';
+import Description from './Components/Overview';
 import Review from './Components/Review';
 import Footer from './Components/Footer';
 import Header from './Components/Header';

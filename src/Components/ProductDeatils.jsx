@@ -13,7 +13,7 @@ const ProductDetails = () => {
     <div>
     <div className="heading-container product-heading">
       <h2
-        className="text-center mt-4 fw-bold"
+        className="text-center mt-4 fw-bold mb-4"
         style={{ textShadow: "0px 5px 10px rgba(0, 0, 0, 0.3)" }}
       >
         Product Details

@@ -3,7 +3,8 @@ import React from 'react'
 function WhyBizBooster() {
   return (
     <div>
-         <div className="mx-5 mb-4">
+         <div className="mx-2 mx-lg-5 mb-4">
+
             <hr/>
             <h5 className="fw-bold py-2"  style={{ textDecoration: 'underline' }}>Why Fetch True</h5>
             <ul className=" text-secondary">

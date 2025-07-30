@@ -12,12 +12,13 @@ const Description = () => {
  
 
   return (
-    <div className="mx-5 mb-4">
+<div className="mx-2 mx-lg-5 mb-4">
+
       <hr />
       <Row>
         
         <Col md={12}>
-          <h5 className="fw-bold py-2" style={{ textDecoration: "underline" }}>Description</h5>
+          <h5 className="fw-bold py-2" style={{ textDecoration: "underline" }}>Overview</h5>
           <ul className="text-secondary">
             <li>Lorem ipsum dolor sit amet.</li>
             <li>Lorem ipsum dolor sit amet consectetur adipisicing.</li>
