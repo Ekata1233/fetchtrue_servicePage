@@ -8,9 +8,8 @@ import { ServiceProvider } from './Components/context/ServiceContext.jsx';
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ServiceProvider>
-      <BrowserRouter>
+     
         <App />
-      </BrowserRouter>
     </ServiceProvider>
   </StrictMode>
 );
