@@ -11,15 +11,16 @@ import {
 import { IoMdDoneAll } from "react-icons/io";
 import { FaShareAlt, FaUserPlus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useService } from "./context/ServiceContext";
 
 function FAQs() {
   const navigate = useNavigate();
+  const { service, loading } = useService();
 
-  // Modal and Provider logic
+
+
   const [showModal, setShowModal] = useState(false);
   const [selectedProviders, setSelectedProviders] = useState("fetch-true");
-
-  const providerList = ["Provider One", "Provider Two", "Provider Three"];
 
   const handleClose = () => setShowModal(false);
   const handleShow = () => setShowModal(true);
@@ -70,6 +71,9 @@ function FAQs() {
       ]
     }
   ];
+
+  if (loading) return <div className="text-center my-5">Loading...</div>;
+  if (!service) return <div className="text-center my-5">No service data available.</div>;
 
   return (
     <div className="py-5" style={{ backgroundColor: "rgba(0, 81, 157, 0.04)" }}>
