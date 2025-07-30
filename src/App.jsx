@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import './App.css'
+import './App.css';
 import { ApiProvider } from './Components/ApiContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Description from './Components/Overview';
@@ -9,31 +9,34 @@ import Header from './Components/Header';
 import WriteReview from './Components/WriteReview';
 import ProductHome from './Components/ProductHome';
 import SelfAddPage from './Components/SelfAddPage';
-import ShareCustomerPage from './Components/ShareCustomerPage';
+import PrivacyPolicy from './Components/Footer/Privacypolices';
+import TermsConditions from './Components/Footer/TermsConditions';
+import ReturnRefund from './Components/Footer/ReturnRefund';
+import CancellationPolicy from './Components/Footer/CancellationPolicy';
+import Aboutus from './Components/Footer/Aboutus';
 
 function App() {
-
   return (
-    <>
-      {/* <BrowserRouter> */}
-        <ApiProvider>
-          <Header />
-          <Routes>
+    <BrowserRouter>
+      <ApiProvider>
+        <Header />
+        <Routes>
+          <Route path="/" element={<ProductHome />} />
+          <Route path="/description" element={<Description />} />
+          <Route path="/review" element={<Review />} />
+          <Route path="/writeareview" element={<WriteReview />} />
+          <Route path="/self-add" element={<SelfAddPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/return-policy" element={<ReturnRefund />} />
+          <Route path="/terms&conditons" element={<TermsConditions />} />
+                    <Route path="/cancellation-policy" element={<CancellationPolicy />} />
+                    <Route path="/about-us" element={<Aboutus />} />
 
-            <Route path='/' element={<ProductHome />} />
-            <Route path="/description" element={<Description />} />
-            <Route path="/review" element={<Review />} />
-            <Route path="/writeareview" element={<WriteReview />} />
-            <Route path="/self-add" element={<SelfAddPage />} />
-            {/* <Route path="/share-to-customer" element={<ShareCustomerPage />} /> */}
-
-          </Routes>
-          <Footer />
-        </ApiProvider>
-      {/* </BrowserRouter> */}
-
-    </>
-  )
+        </Routes>
+        <Footer />
+      </ApiProvider>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;

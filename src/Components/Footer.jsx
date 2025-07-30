@@ -96,7 +96,7 @@ const Footer = () => {
             <p><FaMapMarkerAlt className="me-2" /> Office no.307, 3rd Floor, Amanora Chamber, Amanora Mall, Hadapsar, Pune- 411028</p>
             <p><FaEnvelope className="me-2" /> info@fetchtrue.com</p>
             <p><FaPhoneAlt className="me-2" /> +91 9309517500</p>
-            <p><TbWorld className="me-2" /> 
+            <p><TbWorld className="me-2" />
               <a href="http://www.fetchtrue.com" target="_blank" rel="noopener noreferrer" className="text-white text-decoration-none">
                 www.fetchtrue.com
               </a>
@@ -106,10 +106,12 @@ const Footer = () => {
           {/* Quick Links */}
           <div className="col-md-4 col-lg-4 col-xl-4 mx-auto mt-3">
             <h5 className="text-uppercase mb-4 font-weight-bold text-warning">Quick Links</h5>
-            <p><a href="/contact" className="text-white text-decoration-none">Contact Us</a></p>
             <p><a href="/privacy-policy" className="text-white text-decoration-none">Privacy Policy</a></p>
             <p><a href="/return-policy" className="text-white text-decoration-none">Return & Refund Policy</a></p>
-            <p><a href="/terms" className="text-white text-decoration-none">Terms & Conditions</a></p>
+            <p><a href="/terms&conditons" className="text-white text-decoration-none">Terms & Conditions</a></p>
+            <p><a href="/cancellation-policy" className="text-white text-decoration-none">Cancellation Policy</a></p>
+            <p><a href="/about-us" className="text-white text-decoration-none">About Us</a></p>
+
           </div>
 
         </div>
