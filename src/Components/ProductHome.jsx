@@ -21,7 +21,7 @@ return (
     {/* <Carousell /> */}
     <ProductDeatils />
     <Benifits/>
-    <Description setDiscountedPrice={setDiscountedPrice} /> 
+    <Description /> 
     <Highlight/>
     <WhyBizBooster/>
     <Document />

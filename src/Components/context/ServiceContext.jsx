@@ -9,7 +9,7 @@ export const ServiceProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   // Hardcoded serviceId OR fetch it dynamically from query or localStorage
-  const serviceId = "688868bc1c221ee4ee4b6007";
+  const serviceId = "687767fb4f90fe641a20cf48";
 
   useEffect(() => {
     const fetchService = async () => {
