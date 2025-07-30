@@ -23,7 +23,7 @@ return (
     <HitW />
     <FAQs />
     <WhyBizBooster />
-    {discountedPrice !== null && <Contact discountedPrice={discountedPrice} />}
+    {/* <Contact/> */}
   </div>
   );
 }

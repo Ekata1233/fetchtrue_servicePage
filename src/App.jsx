@@ -8,27 +8,30 @@ import Footer from './Components/Footer';
 import Header from './Components/Header';
 import WriteReview from './Components/WriteReview';
 import ProductHome from './Components/ProductHome';
+import SelfAddPage from './Components/SelfAddPage';
+import ShareCustomerPage from './Components/ShareCustomerPage';
 
 function App() {
 
   return (
     <>
       <BrowserRouter>
-      <ApiProvider> 
-        <Header/>
-        <Routes>
-         
-          <Route path='/' element={<ProductHome /> } />
-          <Route path="/description" element={<Description />} />
-          <Route path="/review" element={<Review />} />
-          <Route path="/writeareview" element={<WriteReview />} />
+        <ApiProvider>
+          <Header />
+          <Routes>
 
-         
-        </Routes>
-        <Footer/>
-      </ApiProvider>
-    </BrowserRouter>
-    
+            <Route path='/' element={<ProductHome />} />
+            <Route path="/description" element={<Description />} />
+            <Route path="/review" element={<Review />} />
+            <Route path="/writeareview" element={<WriteReview />} />
+            <Route path="/self-add" element={<SelfAddPage />} />
+            <Route path="/share-to-customer" element={<ShareCustomerPage />} />
+
+          </Routes>
+          <Footer />
+        </ApiProvider>
+      </BrowserRouter>
+
     </>
   )
 }

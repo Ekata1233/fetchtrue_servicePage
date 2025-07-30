@@ -198,3 +198,79 @@ padding: 0%;
     margin-top: -1px;
   }
 }
+
+.checkout-wrapper {
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+  font-family: 'Poppins', sans-serif;
+  text-align: center;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  position: relative;
+}
+
+.step-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #ccc;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  z-index: 2;
+}
+
+.step-circle.active {
+  background: #2563eb;
+}
+
+.step-label {
+  margin-top: 5px;
+  font-size: 14px;
+  text-align: center;
+  flex: 1;
+}
+
+.step-line {
+  flex: 1;
+  height: 3px;
+  background: #ccc;
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  z-index: 1;
+}
+
+.step-line.active {
+  background: #2563eb;
+}
+
+.step-content button {
+  margin: 10px;
+  padding: 10px 20px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+}
+
+.success-icon {
+  font-size: 48px;
+  color: green;
+  margin-bottom: 15px;
+}
