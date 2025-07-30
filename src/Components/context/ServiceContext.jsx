@@ -8,10 +8,12 @@ export const ServiceProvider = ({ children }) => {
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Hardcoded serviceId OR fetch it dynamically from query or localStorage
-  const serviceId = "687767fb4f90fe641a20cf48";
+  const urlParams = new URLSearchParams(window.location.search);
+  const serviceId = urlParams.get('serviceId') || "687767fb4f90fe641a20cf48";
+  // const serviceId = "";
 
   useEffect(() => {
+    if (!serviceId) return;
     const fetchService = async () => {
       try {
         const res = await axios.get(`https://biz-booster.vercel.app/api/service/${serviceId}`);
