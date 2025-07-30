@@ -15,7 +15,7 @@ function App() {
 
   return (
     <>
-      <BrowserRouter>
+      {/* <BrowserRouter> */}
         <ApiProvider>
           <Header />
           <Routes>
@@ -25,12 +25,12 @@ function App() {
             <Route path="/review" element={<Review />} />
             <Route path="/writeareview" element={<WriteReview />} />
             <Route path="/self-add" element={<SelfAddPage />} />
-            <Route path="/share-to-customer" element={<ShareCustomerPage />} />
+            {/* <Route path="/share-to-customer" element={<ShareCustomerPage />} /> */}
 
           </Routes>
           <Footer />
         </ApiProvider>
-      </BrowserRouter>
+      {/* </BrowserRouter> */}
 
     </>
   )

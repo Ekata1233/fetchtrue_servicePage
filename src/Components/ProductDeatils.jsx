@@ -2,8 +2,13 @@ import { Col, Container, Row } from "react-bootstrap";
 import Banner from "../assets/Black Modern Grand Opening Store Outdoor Banner.png";
 import { Link } from "react-router-dom";
 import { IoIosStar } from "react-icons/io";
+import { useService } from "./context/ServiceContext";
 
 const ProductDetails = () => {
+   const { services, loadingServices, errorServices } = useService(); // 👈 accessing context
+
+  // Log services to the console
+  console.log("All Services:", services);
   return (
     <div>
     <div className="heading-container product-heading">
