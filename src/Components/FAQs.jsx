@@ -166,18 +166,7 @@ function FAQs() {
 
             <hr />
 
-            {providerList.map((provider, index) => (
-              <Form.Check
-                key={index}
-                type="radio"
-                label={provider}
-                name="providerOptions"
-                value={provider}
-                checked={selectedProviders === provider}
-                onChange={(e) => setSelectedProviders(e.target.value)}
-                className="mb-2"
-              />
-            ))}
+           
           </Modal.Body>
 
           <Modal.Footer>
