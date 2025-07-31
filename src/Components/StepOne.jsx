@@ -29,7 +29,7 @@ function StepOne({
   setShowAllCoupons,
   termsAgreed,
   setTermsAgreed,
-  trueAssurityCharges,
+  fetchtrueAssurityCharges,
   onProceed,
 }) {
   const handleSaveForm = () => setFormSaved(true);
@@ -191,7 +191,7 @@ function StepOne({
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}><span>Coupon Discount ({appliedCoupon?.percent || 0}%)</span><span>- ₹{appliedCoupon ? ((900 * appliedCoupon.percent) / 100).toFixed(2) : '0.00'}</span></Box>
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}><span>Service GST (18%)</span><span>₹153</span></Box>
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}><span>Platform Fee ( ₹ )</span><span>₹30</span></Box>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}><span>True Assurity Charges (2%)</span><span>₹{trueAssurityCharges}</span></Box>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}><span>Fetch True Assurity Charges (2%)</span><span>₹{fetchtrueAssurityCharges}</span></Box>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #ccc', pt: 2 }}>
           <Typography variant="h6">Grand Total</Typography>
           <Typography variant="h6">
@@ -200,7 +200,7 @@ function StepOne({
               const serviceDiscount = base * 0.1;
               const afterServiceDiscount = base - serviceDiscount;
               const couponDiscount = appliedCoupon ? (afterServiceDiscount * appliedCoupon.percent) / 100 : 0;
-              const total = afterServiceDiscount - couponDiscount + 153 + 30 + (trueAssurityCharges || 0);
+              const total = afterServiceDiscount - couponDiscount + 153 + 30 + (fetchtrueAssurityCharges || 0);
               return total.toFixed(2);
             })()}
           </Typography>
