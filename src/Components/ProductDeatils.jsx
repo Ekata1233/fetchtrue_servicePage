@@ -36,7 +36,7 @@ const ProductDetails = () => {
             alt={serviceName}
             className="img-fluid shadow rounded"
             style={{
-              maxHeight: "350px",
+              maxHeight: "300px",
               width: "100%",
               objectFit: "cover",
             }}
@@ -45,7 +45,7 @@ const ProductDetails = () => {
 
         {/* Details Section */}
         <Col md={4} className="my-2 pe-md-5">
-          <div className="p-lg-5 shadow rounded bg-white" style={{ width: "100%", height: "350px", objectFit: "cover" }}
+          <div className="p-lg-5 shadow rounded bg-white" style={{ width: "100%", height: "300px", objectFit: "cover" }}
           >
             <h5 className="fw-bold">{serviceName}</h5>
 
