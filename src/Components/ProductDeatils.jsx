@@ -62,7 +62,7 @@ const ProductDetails = () => {
                 </span>
               </Link>
             </p>
-
+            
             <p>
               <span className="fw-bold ms-2 fs-4">₹{discountedPrice}</span>
               {discount > 0 && (
@@ -74,6 +74,7 @@ const ProductDetails = () => {
                 </span>
               )}
             </p>
+            
 
             {service.keyValues?.length > 0 && (
               <div className="mt-3">
@@ -90,6 +91,8 @@ const ProductDetails = () => {
         </Col>
       </Row>
     </div>
+          
+         
 
 
 
