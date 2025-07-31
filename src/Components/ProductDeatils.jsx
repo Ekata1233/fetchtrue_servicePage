@@ -23,20 +23,30 @@ const ProductDetails = () => {
 
   return (
     <div className="container-fluid px-0">
-      <Row className="g-0">
+      <Row className="g-0 align-items-start">
         {/* Image Section */}
-        <Col md={8} className="my-2 pe-md-4 ps-md-5">
+         <Col
+          xs={12}
+          md={8}
+          className="my-2 pe-md-4 ps-md-5 d-flex justify-content-center"
+        >
           <img
             src={thumbnailImage || "/fallback.jpg"}
-            className="w-100 h-100 shadow"
             alt={serviceName}
+            className="img-fluid shadow rounded"
+            style={{
+              maxHeight: "300px",
+              width: "100%",
+              objectFit: "cover",
+            }}
           />
         </Col>
 
         {/* Details Section */}
         <Col md={4} className="my-2 pe-md-5">
-          <div className="p-lg-5 shadow rounded bg-white h-100">
-            <h5 className="fw-bold">{serviceName}</h5>
+          <div className="p-lg-5 shadow rounded bg-white py-5 " style={{ width: "100%", height: "300px", objectFit: "cover" }}
+          >
+            <h5 className="fw-bold ps-3  ">{serviceName}</h5>
 
             <p className="d-flex align-items-center text-white mb-1 py-3">
               <Link
@@ -51,7 +61,7 @@ const ProductDetails = () => {
                 </span>
               </Link>
             </p>
-
+            
             <p>
               <span className="fw-bold ms-2 fs-4">₹{discountedPrice}</span>
               {discount > 0 && (
@@ -63,6 +73,7 @@ const ProductDetails = () => {
                 </span>
               )}
             </p>
+            
 
             {service.keyValues?.length > 0 && (
               <div className="mt-3">
@@ -79,6 +90,10 @@ const ProductDetails = () => {
         </Col>
       </Row>
     </div>
+          
+         
+
+
 
 
   );
