@@ -45,9 +45,9 @@ const ProductDetails = () => {
 
         {/* Details Section */}
         <Col md={4} className="my-2 pe-md-5">
-          <div className="p-lg-5 shadow rounded bg-white" style={{ width: "100%", height: "300px", objectFit: "cover" }}
+          <div className="p-lg-5 shadow rounded bg-white py-5 " style={{ width: "100%", height: "300px", objectFit: "cover" }}
           >
-            <h5 className="fw-bold">{serviceName}</h5>
+            <h5 className="fw-bold ps-3  ">{serviceName}</h5>
 
             <p className="d-flex align-items-center text-white mb-1 py-3">
               <Link
