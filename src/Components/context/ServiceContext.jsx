@@ -8,12 +8,20 @@ export const ServiceProvider = ({ children }) => {
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const [reviews, setReviews] = useState([]);
+  const [averageRating, setAverageRating] = useState(0);
+  const [ratingDistribution, setRatingDistribution] = useState({});
+  const [totalReviews, setTotalReviews] = useState(0);
+
   const urlParams = new URLSearchParams(window.location.search);
   const serviceId = urlParams.get('serviceId') || "687767fb4f90fe641a20cf48";
+  const userId = urlParams.get('userId') || "";
+
   // const serviceId = "";
 
   useEffect(() => {
     if (!serviceId) return;
+
     const fetchService = async () => {
       try {
         const res = await axios.get(`https://biz-booster.vercel.app/api/service/${serviceId}`);
@@ -30,8 +38,35 @@ export const ServiceProvider = ({ children }) => {
     fetchService();
   }, []);
 
+  useEffect(() => {
+    if (!serviceId) return;
+
+    const fetchReviews = async () => {
+      try {
+        const res = await axios.get(`https://biz-booster.vercel.app/api/service/review/${serviceId}`);
+        if (res.data.success) {
+          setReviews(res.data.reviews || []);
+          setAverageRating(res.data.averageRating || 0);
+          setRatingDistribution(res.data.ratingDistribution || {});
+          setTotalReviews(res.data.totalReviews || 0);
+        }
+      } catch (err) {
+        console.error("Failed to fetch reviews:", err);
+      }
+    };
+
+    fetchReviews();
+  }, [serviceId]);
+
   return (
-    <ServiceContext.Provider value={{ service, loading }}>
+    <ServiceContext.Provider value={{
+      service, loading, reviews,
+      averageRating,
+      ratingDistribution,
+      totalReviews,
+      serviceId,
+      userId
+    }}>
       {children}
     </ServiceContext.Provider>
   );

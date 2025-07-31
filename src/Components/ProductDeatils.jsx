@@ -6,7 +6,6 @@ import { useService } from "./context/ServiceContext";
 const ProductDetails = () => {
   const { service, loading } = useService();
 
-  console.log("serive detais  ; ", service)
 
   if (loading) return <div className="text-center my-5">Loading...</div>;
   if (!service) return <div className="text-center my-5">No service data available.</div>;

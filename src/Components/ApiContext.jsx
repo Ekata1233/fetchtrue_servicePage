@@ -12,7 +12,6 @@ export const ApiProvider = ({ children }) => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const id = queryParams.get("id");
-console.log(data);
 
     useEffect(() => {
         const fetchData = async () => {
