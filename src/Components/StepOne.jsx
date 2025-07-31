@@ -2,13 +2,7 @@ import React from 'react';
 import { Form, Row, Col, Button, Container, Card } from 'react-bootstrap';
 import { FaCity, FaEnvelope, FaPhoneAlt, FaUser } from 'react-icons/fa';
 import { Box, Typography } from '@mui/material';
-
-const states = ['Maharashtra', 'Madhya Pradesh', 'Gujarat'];
-const cities = {
-  Maharashtra: ['Mumbai', 'Pune'],
-  'Madhya Pradesh': ['Bhopal', 'Indore'],
-  Gujarat: ['Ahmedabad', 'Surat'],
-};
+import { useService } from './context/ServiceContext';
 
 const coupons = [
   { id: 1, percent: 150, code: 'SUPER150' },
@@ -32,7 +26,38 @@ function StepOne({
   fetchtrueAssurityCharges,
   onProceed,
 }) {
-  const handleSaveForm = () => setFormSaved(true);
+  const {
+    service,
+    createServiceCustomer,
+    customerSubmitting,
+    customerError,
+    userId,
+    commission,
+    coupon, loadingCoupon
+  } = useService();
+
+  console.log("coupon details : ", coupon)
+
+  const handleSaveForm = async () => {
+    const fd = new FormData();
+    fd.append("fullName", formData.name);
+    fd.append("phone", formData.phone);
+    fd.append("email", formData.email);
+    fd.append("description", formData.description);
+    fd.append("address", formData.address);
+    fd.append("city", formData.city);
+    fd.append("state", formData.state);
+    fd.append("country", formData.country);
+    fd.append("user", userId);
+
+    const result = await createServiceCustomer(fd);
+
+    if (result.success) {
+      setFormSaved(true);
+    } else {
+      alert(`Failed to save: ${result.error}`);
+    }
+  };
 
   const handleApplyCoupon = (coupon) => {
     setAppliedCoupon(coupon);
@@ -69,13 +94,13 @@ function StepOne({
               <Col md={6}>
                 <Form.Group controlId="name">
                   <Form.Label>Name</Form.Label>
-                  <Form.Control value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+                  <Form.Control placeholder="Enter your name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
                 </Form.Group>
               </Col>
               <Col md={6}>
                 <Form.Group controlId="phone">
                   <Form.Label>Phone</Form.Label>
-                  <Form.Control value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
+                  <Form.Control placeholder="Enter your phone" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
                 </Form.Group>
               </Col>
             </Row>
@@ -83,13 +108,13 @@ function StepOne({
               <Col md={6}>
                 <Form.Group controlId="email">
                   <Form.Label>Email</Form.Label>
-                  <Form.Control value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+                  <Form.Control placeholder="Enter your email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
                 </Form.Group>
               </Col>
               <Col md={6}>
                 <Form.Group controlId="description">
                   <Form.Label>Description</Form.Label>
-                  <Form.Control as="textarea" rows={1} value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
+                  <Form.Control placeholder="Enter your description" as="textarea" rows={1} value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
                 </Form.Group>
               </Col>
             </Row>
@@ -97,16 +122,13 @@ function StepOne({
               <Col md={6}>
                 <Form.Group controlId="address">
                   <Form.Label>Address</Form.Label>
-                  <Form.Control value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} />
+                  <Form.Control placeholder="Enter your address" value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} />
                 </Form.Group>
               </Col>
               <Col md={6}>
                 <Form.Group controlId="state">
                   <Form.Label>State</Form.Label>
-                  <Form.Select value={formData.state} onChange={(e) => setFormData({ ...formData, state: e.target.value, city: '' })}>
-                    <option value="">Select</option>
-                    {states.map((s) => <option key={s} value={s}>{s}</option>)}
-                  </Form.Select>
+                  <Form.Control placeholder="Enter your state" value={formData.state} onChange={(e) => setFormData({ ...formData, state: e.target.value })} />
                 </Form.Group>
               </Col>
             </Row>
@@ -114,20 +136,20 @@ function StepOne({
               <Col md={6}>
                 <Form.Group controlId="city">
                   <Form.Label>City</Form.Label>
-                  <Form.Select value={formData.city} onChange={(e) => setFormData({ ...formData, city: e.target.value })} disabled={!formData.state}>
-                    <option value="">Select</option>
-                    {(cities[formData.state] || []).map((c) => <option key={c} value={c}>{c}</option>)}
-                  </Form.Select>
+                  <Form.Control placeholder="Enter your city" value={formData.city} onChange={(e) => setFormData({ ...formData, city: e.target.value })} />
                 </Form.Group>
               </Col>
               <Col md={6}>
                 <Form.Group controlId="country">
                   <Form.Label>Country</Form.Label>
-                  <Form.Control value={formData.country} onChange={(e) => setFormData({ ...formData, country: e.target.value })} />
+                  <Form.Control placeholder="Enter your country" value={formData.country} onChange={(e) => setFormData({ ...formData, country: e.target.value })} />
                 </Form.Group>
               </Col>
             </Row>
-            <Button onClick={handleSaveForm}>Save Data</Button>
+            <Button onClick={handleSaveForm} disabled={customerSubmitting}>
+              {customerSubmitting ? "Saving..." : "Save Data"}
+            </Button>
+            {customerError && <p className="text-danger mt-2">{customerError}</p>}
           </div>
         </Form>
       ) : (
@@ -185,29 +207,59 @@ function StepOne({
 
       {/* Checkout Summary */}
       <Box sx={{ mt: 4, p: 3, border: '1px solid #ccc', borderRadius: 2 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}><span>Listing Price (15%)</span><span>₹1000</span></Box>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}><span>Service Discount (10%)</span><span>- ₹100</span></Box>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}><span>Price After Discount</span><span>₹900</span></Box>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}><span>Coupon Discount ({appliedCoupon?.percent || 0}%)</span><span>- ₹{appliedCoupon ? ((900 * appliedCoupon.percent) / 100).toFixed(2) : '0.00'}</span></Box>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}><span>Service GST (18%)</span><span>₹153</span></Box>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}><span>Platform Fee ( ₹ )</span><span>₹30</span></Box>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}><span>Fetch True Assurity Charges (2%)</span><span>₹{fetchtrueAssurityCharges}</span></Box>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #ccc', pt: 2 }}>
-          <Typography variant="h6">Grand Total</Typography>
-          <Typography variant="h6">
-            ₹{(() => {
-              const base = 1000;
-              const serviceDiscount = base * 0.1;
-              const afterServiceDiscount = base - serviceDiscount;
-              const couponDiscount = appliedCoupon ? (afterServiceDiscount * appliedCoupon.percent) / 100 : 0;
-              const total = afterServiceDiscount - couponDiscount + 153 + 30 + (fetchtrueAssurityCharges || 0);
-              return total.toFixed(2);
-            })()}
-          </Typography>
-        </Box>
+        {(() => {
+          const listingPrice = service?.price ?? 0;
+          const discountPercent = service?.discount ?? 0;
+          const discountAmount = (listingPrice * discountPercent) / 100;
+          const priceAfterDiscount = listingPrice - discountAmount;
+
+          const couponPercent = appliedCoupon?.percent ?? 0;
+          const couponDiscount = (priceAfterDiscount * couponPercent) / 100;
+
+          const gstPercent = service?.gst ?? 0;
+          const gstAmount = (priceAfterDiscount * gstPercent) / 100;
+
+          const platformFeePercent = commission?.[0]?.platformFee ?? 0;
+          const platformFee = (listingPrice * platformFeePercent) / 100;
+
+          const assurityFeePercent = commission?.[0]?.assurityfee ?? 0;
+          const assurityFee = (listingPrice * assurityFeePercent) / 100;
+
+          const grandTotal = priceAfterDiscount - couponDiscount + gstAmount + platformFee + assurityFee;
+
+          return (
+            <>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>Listing Price </span><span>₹{listingPrice.toFixed(2)}</span>
+              </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>Service Discount ({discountPercent}%)</span><span>- ₹{discountAmount.toFixed(2)}</span>
+              </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>Price After Discount</span><span>₹{priceAfterDiscount.toFixed(2)}</span>
+              </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>Coupon Discount ({couponPercent}%)</span><span>- ₹{couponDiscount.toFixed(2)}</span>
+              </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>Service GST ({gstPercent}%)</span><span>₹{gstAmount.toFixed(2)}</span>
+              </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>Platform Fee ({platformFeePercent}%)</span><span>₹{platformFee.toFixed(2)}</span>
+              </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                <span>Fetch True Assurity Charges ({assurityFeePercent}%)</span><span>₹{assurityFee.toFixed(2)}</span>
+              </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #ccc', pt: 2 }}>
+                <Typography variant="h6">Grand Total</Typography>
+                <Typography variant="h6">₹{grandTotal.toFixed(2)}</Typography>
+              </Box>
+            </>
+          );
+        })()}
+
       </Box>
 
-      {/* Terms & Proceed */}
       <Form.Check
         type="checkbox"
         label="I agree with the terms and conditions"
@@ -216,7 +268,6 @@ function StepOne({
         onChange={(e) => setTermsAgreed(e.target.checked)}
       />
 
-      {/* Always visible Proceed Button */}
       <div className="text-center mt-4">
         <Button
           variant="primary"
