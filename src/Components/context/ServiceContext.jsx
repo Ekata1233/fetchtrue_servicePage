@@ -13,6 +13,9 @@ export const ServiceProvider = ({ children }) => {
   const [ratingDistribution, setRatingDistribution] = useState({});
   const [totalReviews, setTotalReviews] = useState(0);
 
+  const [providers, setProviders] = useState([]); // 🔥 New: providers subscribed to this service
+  const [providersLoading, setProvidersLoading] = useState(true);
+
   const urlParams = new URLSearchParams(window.location.search);
   const serviceId = urlParams.get('serviceId') || "687767fb4f90fe641a20cf48";
   const userId = urlParams.get('userId') || "";
@@ -58,6 +61,25 @@ export const ServiceProvider = ({ children }) => {
     fetchReviews();
   }, [serviceId]);
 
+  useEffect(() => {
+    if (!serviceId) return;
+
+    const fetchProviders = async () => {
+      try {
+        const res = await axios.get(`https://biz-booster.vercel.app/api/provider/findByService/${serviceId}`);
+        if (res.data.success) {
+          setProviders(res.data.data || []);
+        }
+      } catch (err) {
+        console.error("Failed to fetch providers:", err);
+      } finally {
+        setProvidersLoading(false);
+      }
+    };
+
+    fetchProviders();
+  }, [serviceId]);
+
   return (
     <ServiceContext.Provider value={{
       service, loading, reviews,
@@ -65,7 +87,7 @@ export const ServiceProvider = ({ children }) => {
       ratingDistribution,
       totalReviews,
       serviceId,
-      userId
+      userId,  providers, providersLoading
     }}>
       {children}
     </ServiceContext.Provider>
