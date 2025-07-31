@@ -6,6 +6,7 @@ import {
   Container,
   Form,
   Modal,
+  Offcanvas,
   Row,
   Spinner
 } from "react-bootstrap";
@@ -20,7 +21,7 @@ function FAQs() {
   const [showModal, setShowModal] = useState(false);
   const [selectedProviders, setSelectedProviders] = useState("fetch-true");
 
-  const providerList = ["provider one","provider two","provider three"]
+  const providerList = ["provider one", "provider two", "provider three"];
 
   const handleClose = () => setShowModal(false);
   const handleShow = () => setShowModal(true);
@@ -29,14 +30,22 @@ function FAQs() {
     navigate("/self-add");
   };
 
-  // Extract dynamic FAQ from serviceDetails
   const faqList =
     service?.serviceDetails?.faq?.length > 0
       ? service.serviceDetails.faq.map((item) => ({
         question: item.question,
-        points: [item.answer] // Wrap answer in array to match your design
+        points: [item.answer]
       }))
       : [];
+
+  const modalStyles = {
+    transform: "translateY(0)",
+    animation: "slideUp 0.4s ease-out",
+    "@keyframes slideUp": {
+      from: { transform: "translateY(100%)", opacity: 0 },
+      to: { transform: "translateY(0)", opacity: 1 }
+    }
+  };
 
   if (loading) {
     return (
@@ -47,11 +56,7 @@ function FAQs() {
   }
 
   if (!service) {
-    return (
-      <div className="text-center my-5">
-        No service data available.
-      </div>
-    );
+    return <div className="text-center my-5">No service data available.</div>;
   }
 
   return (
@@ -132,47 +137,165 @@ function FAQs() {
           </Row>
         </Container>
 
-        {/* Modal */}
-        <Modal show={showModal} onHide={handleClose} centered>
-          <Modal.Header closeButton>
-            <Modal.Title>Provider Available</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Form.Check
-              type="radio"
-              label="Fetch True"
-              name="providerOptions"
-              value="fetch-true"
-              checked={selectedProviders === "fetch-true"}
-              onChange={(e) => setSelectedProviders(e.target.value)}
-            />
-            <hr />
+        {/* Modal with inline animation */}
+    <Offcanvas
+  show={showModal}
+  onHide={handleClose}
+  placement="bottom"
+  backdrop={true}
+  scroll={true}
+  style={{
+    height: "70vh", // 👈 Increased height
+    borderTopLeftRadius: "20px",
+    borderTopRightRadius: "20px",
+    overflowY: "auto",
+    transition: "transform 0.4s ease-in-out",
+  }}
+>
+  <Offcanvas.Header closeButton>
+    <Offcanvas.Title>Provider Available</Offcanvas.Title>
+  </Offcanvas.Header>
+<Offcanvas.Body>
+  {/* Fetch True Block */}
+ <div
+  className="d-flex align-items-center justify-content-between mb-3 p-3 rounded shadow-sm"
+  style={{
+    background: "linear-gradient(135deg, #B3D8FF, #D6ECFF)", // faint gradient
+    color: "#003366", // readable darker text
+  }}
+>
+  {/* Image */}
+  <div
+    className="p-1 bg-white rounded-circle me-3"
+    style={{
+      width: "60px",
+      height: "60px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    }}
+  >
+    <img
+      src="/fetch-true.jpg"
+      alt="Fetch True"
+      style={{
+        width: "50px",
+        height: "50px",
+        borderRadius: "50%",
+        objectFit: "cover",
+      }}
+    />
+  </div>
 
-            {providerList.map((provider, index) => (
-              <Form.Check
-                key={index}
-                type="radio"
-                label={provider}
-                name="providerOptions"
-                value={provider}
-                checked={selectedProviders === provider}
-                onChange={(e) => setSelectedProviders(e.target.value)}
-                className="mb-2"
-              />
-            ))}
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={handleClose}>
-              Cancel
-            </Button>
-            <Button
-              style={{ backgroundColor: "#00509D" }}
-              onClick={handleProceed}
-            >
-              Proceed to Checkout
-            </Button>
-          </Modal.Footer>
-        </Modal>
+  {/* Info section */}
+  <div className="flex-grow-1">
+    <h6 className="mb-1 fw-bold">Fetch True</h6>
+    <div className="d-flex flex-wrap align-items-center gap-3">
+      <div style={{ textDecoration: "line-through", color: "#666" }}>
+        ₹1000
+      </div>
+      <div className="fw-bold">₹800</div>
+      <div className="badge bg-success-subtle text-success border border-success">
+        20% OFF
+      </div>
+      <div className="badge bg-success-subtle text-success border border-success">
+        20% Commission
+      </div>
+    </div>
+  </div>
+
+  {/* Radio button */}
+  <div>
+    <Form.Check
+      type="radio"
+      name="providerOptions"
+      value="fetch-true"
+      checked={selectedProviders === "fetch-true"}
+      onChange={(e) => setSelectedProviders(e.target.value)}
+    />
+  </div>
+</div>
+
+
+  {/* Dynamic Providers */}
+  {providerList.map((provider, index) => (
+    <div
+      key={index}
+      className="d-flex align-items-center justify-content-between mb-3 p-3 rounded shadow-sm bg-white border"
+    >
+      {/* Image */}
+      <div
+        className="p-1 bg-light rounded-circle border me-3"
+        style={{
+          width: "60px",
+          height: "60px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <img
+          src="/provider.jpg"
+          alt={provider}
+          style={{
+            width: "50px",
+            height: "50px",
+            borderRadius: "50%",
+            objectFit: "cover",
+          }}
+        />
+      </div>
+
+      {/* Details */}
+      <div className="flex-grow-1">
+        <h6 className="mb-1 fw-bold">{provider}</h6>
+        <div className="d-flex flex-wrap align-items-center gap-3">
+          <div style={{ textDecoration: "line-through", color: "#888" }}>
+            ₹1200
+          </div>
+          <div className="fw-bold text-dark">₹900</div>
+          <div className="badge bg-success-subtle text-success border border-success">
+            25% OFF
+          </div>
+          <div className="badge bg-success-subtle text-success border border-success">
+            20% Commission
+          </div>
+        </div>
+      </div>
+
+      {/* Radio */}
+      <div>
+        <Form.Check
+          type="radio"
+          name="providerOptions"
+          value={provider}
+          checked={selectedProviders === provider}
+          onChange={(e) => setSelectedProviders(e.target.value)}
+        />
+      </div>
+    </div>
+  ))}
+
+  {/* Buttons */}
+  <div className="d-flex justify-content-end gap-2 mt-4">
+    <Button variant="secondary" onClick={handleClose}>
+      Cancel
+    </Button>
+    <Button style={{ backgroundColor: "#00509D" }} onClick={handleProceed}>
+      Proceed to Checkout
+    </Button>
+  </div>
+</Offcanvas.Body>
+
+
+
+
+
+
+</Offcanvas>
+
+
+
       </Container>
     </div>
   );
