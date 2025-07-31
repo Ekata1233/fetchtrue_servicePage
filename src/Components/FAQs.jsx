@@ -6,7 +6,8 @@ import {
   Container,
   Form,
   Modal,
-  Row
+  Row,
+  Spinner
 } from "react-bootstrap";
 import { IoMdDoneAll } from "react-icons/io";
 import { FaShareAlt, FaUserPlus } from "react-icons/fa";
@@ -16,11 +17,10 @@ import { useService } from "./context/ServiceContext";
 function FAQs() {
   const navigate = useNavigate();
   const { service, loading } = useService();
-
-
-
   const [showModal, setShowModal] = useState(false);
   const [selectedProviders, setSelectedProviders] = useState("fetch-true");
+
+  const providerList = ["provider one","provider two","provider three"]
 
   const handleClose = () => setShowModal(false);
   const handleShow = () => setShowModal(true);
@@ -29,51 +29,30 @@ function FAQs() {
     navigate("/self-add");
   };
 
-  const faqList = [
-    {
-      question: "What is Fetch True and how does it work?",
-      points: [
-        "Fetch True is an advanced provider verification tool.",
-        "It helps ensure data reliability in service transactions.",
-        "Users can trust services validated by Fetch True.",
-        "It minimizes fraud and misinformation.",
-        "Easy to use and integrates seamlessly."
-      ]
-    },
-    {
-      question: "How do I register as a provider?",
-      points: [
-        "Click on the 'Self Add' button.",
-        "Choose your provider type and submit details.",
-        "Verification may take up to 24 hours.",
-        "Once verified, your profile is active.",
-        "You’ll receive email confirmation."
-      ]
-    },
-    {
-      question: "What are the benefits of using Fetch True?",
-      points: [
-        "Verified and trustworthy service providers.",
-        "Real-time data and performance insights.",
-        "User reviews and ratings.",
-        "Reduced risk of spam or fraud.",
-        "Boosts customer confidence."
-      ]
-    },
-    {
-      question: "How do I contact support?",
-      points: [
-        "Use the 'Contact Us' page in the app.",
-        "Available via chat, email, or phone.",
-        "Response time is under 24 hours.",
-        "Premium users get priority support.",
-        "Support available 7 days a week."
-      ]
-    }
-  ];
+  // Extract dynamic FAQ from serviceDetails
+  const faqList =
+    service?.serviceDetails?.faq?.length > 0
+      ? service.serviceDetails.faq.map((item) => ({
+        question: item.question,
+        points: [item.answer] // Wrap answer in array to match your design
+      }))
+      : [];
 
-  if (loading) return <div className="text-center my-5">Loading...</div>;
-  if (!service) return <div className="text-center my-5">No service data available.</div>;
+  if (loading) {
+    return (
+      <div className="text-center my-5">
+        <Spinner animation="border" variant="primary" />
+      </div>
+    );
+  }
+
+  if (!service) {
+    return (
+      <div className="text-center my-5">
+        No service data available.
+      </div>
+    );
+  }
 
   return (
     <div className="py-5" style={{ backgroundColor: "rgba(0, 81, 157, 0.04)" }}>
@@ -92,32 +71,36 @@ function FAQs() {
 
         <Row>
           <Col xs={12}>
-            <Accordion defaultActiveKey="" className="text-start border-0">
-              {faqList.map((faq, index) => (
-                <Accordion.Item
-                  eventKey={index.toString()}
-                  className="accor py-4"
-                  key={index}
-                >
-                  <Accordion.Header>
-                    <h6 className="dark fw-bold mb-0">{faq.question}</h6>
-                  </Accordion.Header>
-                  <Accordion.Body>
-                    <ul className="list-unstyled text-secondary">
-                      {faq.points.map((point, idx) => (
-                        <li key={idx}>
-                          <IoMdDoneAll
-                            className="text-success me-2"
-                            style={{ width: "22px", height: "22px" }}
-                          />
-                          {point}
-                        </li>
-                      ))}
-                    </ul>
-                  </Accordion.Body>
-                </Accordion.Item>
-              ))}
-            </Accordion>
+            {faqList.length > 0 ? (
+              <Accordion defaultActiveKey="" className="text-start border-0">
+                {faqList.map((faq, index) => (
+                  <Accordion.Item
+                    eventKey={index.toString()}
+                    className="accor py-4"
+                    key={index}
+                  >
+                    <Accordion.Header>
+                      <h6 className="dark fw-bold mb-0">{faq.question}</h6>
+                    </Accordion.Header>
+                    <Accordion.Body>
+                      <ul className="list-unstyled text-secondary">
+                        {faq.points.map((point, idx) => (
+                          <li key={idx}>
+                            <IoMdDoneAll
+                              className="text-success me-2"
+                              style={{ width: "22px", height: "22px" }}
+                            />
+                            {point}
+                          </li>
+                        ))}
+                      </ul>
+                    </Accordion.Body>
+                  </Accordion.Item>
+                ))}
+              </Accordion>
+            ) : (
+              <p className="text-center text-muted">No FAQs available.</p>
+            )}
           </Col>
         </Row>
 
@@ -163,12 +146,21 @@ function FAQs() {
               checked={selectedProviders === "fetch-true"}
               onChange={(e) => setSelectedProviders(e.target.value)}
             />
-
             <hr />
 
-           
+            {providerList.map((provider, index) => (
+              <Form.Check
+                key={index}
+                type="radio"
+                label={provider}
+                name="providerOptions"
+                value={provider}
+                checked={selectedProviders === provider}
+                onChange={(e) => setSelectedProviders(e.target.value)}
+                className="mb-2"
+              />
+            ))}
           </Modal.Body>
-
           <Modal.Footer>
             <Button variant="secondary" onClick={handleClose}>
               Cancel
