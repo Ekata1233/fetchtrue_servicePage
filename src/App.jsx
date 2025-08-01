@@ -19,7 +19,7 @@ import { ServiceProvider } from './Components/context/ServiceContext';
 function App() {
   return (
     <BrowserRouter>
-      <ServiceProvider>
+      {/* <ServiceProvider> */}
         <ApiProvider>
           <Header />
           <Routes>
@@ -35,7 +35,7 @@ function App() {
           </Routes>
           <Footer />
         </ApiProvider>
-      </ServiceProvider>
+      {/* </ServiceProvider> */}
     </BrowserRouter>
   );
 }
