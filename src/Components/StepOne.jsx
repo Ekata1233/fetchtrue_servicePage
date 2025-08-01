@@ -25,6 +25,8 @@ function StepOne({
   setTermsAgreed,
   fetchtrueAssurityCharges,
   onProceed,
+  setCheckoutId,
+  setTotalAmount,
 }) {
   const navigate = useNavigate();
   const {
@@ -60,15 +62,9 @@ function StepOne({
 
       const customerRes = await createServiceCustomer(fd);
 
-      // console.log("cusotmer service res: ", customerRes)
-
       if (!customerRes.success) {
         throw new Error(customerRes?.message || 'Failed to save customer');
       }
-
-      // const serviceCustomerId = customerRes.data._id;
-
-
       if (customerRes.success) {
         setFormSaved(true);
         setServiceCustomerId(customerRes.data._id);
@@ -119,19 +115,14 @@ function StepOne({
     const listingPrice = service?.price ?? 0;
     const serviceDiscount = service?.discount ?? 0;
     const priceAfterServiceDiscount = listingPrice - (listingPrice * serviceDiscount) / 100;
-
     const couponDiscount = coupon?.percent ?? 0;
     const priceAfterCoupon = priceAfterServiceDiscount - (priceAfterServiceDiscount * couponDiscount) / 100;
-
     const gst = service?.gst ?? 0;
     const gstAmount = (priceAfterCoupon * gst) / 100;
-
     const platformFee = commission?.[0]?.platformFee ?? 0;
     const platformFeeAmount = (listingPrice * platformFee) / 100;
-
     const assurityFee = commission?.[0]?.assurityfee ?? 0;
     const assurityFeeAmount = (listingPrice * assurityFee) / 100;
-
     const totalAmount = priceAfterCoupon + gstAmount + platformFeeAmount + assurityFeeAmount;
 
     const checkoutData = {
@@ -161,7 +152,7 @@ function StepOne({
       totalAmount,
 
       termsCondition: true,
-      paymentMethod: 'cashfree',
+      paymentMethod: 'pac',
       walletAmount: 0,
       otherAmount: totalAmount,
       paidAmount: totalAmount,
@@ -173,26 +164,40 @@ function StepOne({
       notes: formData.notes,
     };
 
-    console.log("checout data : ", checkoutData)
+    console.log("checkout data: ", checkoutData);
+
     try {
-      const res = await axios.post(`https://biz-booster.vercel.app/api/checkout`, checkoutData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      console.log("response of checkout : ", res)
+      const res = await axios.post(
+        'https://biz-booster.vercel.app/api/checkout',
+        checkoutData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      console.log("checkout response: ", res);
+
       if (res?.data?.success) {
         alert('Checkout created successfully!');
+        setCheckoutId(res.data.data._id); // assuming response contains .data._id
+        setTotalAmount(totalAmount);
+        onProceed();
       } else {
         alert('Failed to create checkout.');
       }
     } catch (err) {
-      console.error(err);
+      console.error("Checkout POST error:", err.message);
+      if (err.response) {
+        console.error("Backend responded with:", err.response.data);
+      }
       alert('Something went wrong while saving checkout.');
     } finally {
       setIsCheckoutLoading(false);
     }
-  };
+  }
+
 
   return (
     <Container className='my-5'>

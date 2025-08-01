@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
 import { Container, Card, Button, Form, Row, Col } from 'react-bootstrap';
 
-export default function StepTwo({ onProceed }) {
+export default function StepTwo({ onProceed, checkoutId, totalAmount, formData }) {
   const [paymentMethod, setPaymentMethod] = useState('');
   const [cashfreeOption, setCashfreeOption] = useState('');
 
-  const fullAmount = 4999;
-  const partialAmount = 2999;
+  const fullAmount = totalAmount || 4999;
+  const partialAmount = Math.round(fullAmount / 2);
 
-  const handlePayNow = () => {
+
+  const handlePayNow = async () => {
+    if (!checkoutId) {
+      alert('Checkout ID not found.');
+      return;
+    }
+
     if (!paymentMethod) {
       alert('Please select a payment method.');
       return;
@@ -19,8 +25,39 @@ export default function StepTwo({ onProceed }) {
       return;
     }
 
-    onProceed();
+    const selectedAmount = getSelectedAmount();
+
+    try {
+      const response = await fetch('https://biz-booster.vercel.app/api/payment/generate-payment-link', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          orderId: `checkout_${checkoutId}`,
+          amount: selectedAmount,
+          customerId: checkoutId, // OR use userId if required
+          customerName: formData.name,
+          customerEmail: formData.email,
+          customerPhone: formData.phone,
+          checkoutId,
+        }),
+      });
+
+      const data = await response.json();
+      console.log("Payment API Response:", data);
+
+      if (data.paymentLink) {
+        window.location.href = data.paymentLink;
+      } else {
+        alert('Failed to generate payment link.');
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      alert('Payment initiation failed.');
+    }
   };
+
 
   // Determine displayed total based on selected option
   const getSelectedAmount = () => {

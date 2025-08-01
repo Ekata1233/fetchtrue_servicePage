@@ -101,6 +101,8 @@ export default function SelfAddPage() {
   });
 
   const [formSaved, setFormSaved] = useState(false);
+  const [checkoutId, setCheckoutId] = useState(null);
+  const [totalAmount, setTotalAmount] = useState(0);
   const [showAllCoupons, setShowAllCoupons] = useState(false);
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [inputCoupon, setInputCoupon] = useState('');
@@ -122,34 +124,39 @@ export default function SelfAddPage() {
   };
 
   const getStepContent = (step) => {
-  switch (step) {
-    case 0:
-      return (
-        <StepOne
-          formData={formData}
-          setFormData={setFormData}
-          formSaved={formSaved}
-          setFormSaved={setFormSaved}
-          appliedCoupon={appliedCoupon}
-          setAppliedCoupon={setAppliedCoupon}
-          inputCoupon={inputCoupon}
-          setInputCoupon={setInputCoupon}
-          showAllCoupons={showAllCoupons}
-          setShowAllCoupons={setShowAllCoupons}
-          termsAgreed={termsAgreed}
-          setTermsAgreed={setTermsAgreed}
-          trueAssurityCharges={trueAssurityCharges}
-          onProceed={handleNext}
-        />
-      );
-    case 1:
-      return <StepTwo onProceed={handleNext} />;
-    case 2:
-      return <StepThree />;
-    default:
-      return 'Unknown step';
-  }
-};
+    switch (step) {
+      case 0:
+        return (
+          <StepOne
+            formData={formData}
+            setFormData={setFormData}
+            formSaved={formSaved}
+            setFormSaved={setFormSaved}
+            appliedCoupon={appliedCoupon}
+            setAppliedCoupon={setAppliedCoupon}
+            inputCoupon={inputCoupon}
+            setInputCoupon={setInputCoupon}
+            showAllCoupons={showAllCoupons}
+            setShowAllCoupons={setShowAllCoupons}
+            termsAgreed={termsAgreed}
+            setTermsAgreed={setTermsAgreed}
+            trueAssurityCharges={trueAssurityCharges}
+            onProceed={handleNext}
+            setCheckoutId={setCheckoutId}
+            setTotalAmount={setTotalAmount}
+          />
+        );
+      case 1:
+        return <StepTwo  onProceed={handleNext}
+            checkoutId={checkoutId}
+            totalAmount={totalAmount}
+            formData={formData} />;
+      case 2:
+        return <StepThree />;
+      default:
+        return 'Unknown step';
+    }
+  };
 
 
   return (
@@ -178,7 +185,7 @@ export default function SelfAddPage() {
             <Box sx={{ mb: 2 }}>{getStepContent(activeStep)}</Box>
 
             {activeStep !== 0 && (
-              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', my: 5 }}>
                 <MUIButton onClick={handleBack} disabled={activeStep === 0}>
                   Back
                 </MUIButton>
