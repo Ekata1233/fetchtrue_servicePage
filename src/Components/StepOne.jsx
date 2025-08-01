@@ -1,14 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Form, Row, Col, Button, Container, Card } from 'react-bootstrap';
 import { FaCity, FaEnvelope, FaPhoneAlt, FaUser } from 'react-icons/fa';
-import { Box, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import { useService } from './context/ServiceContext';
-
-const coupons = [
-  { id: 1, percent: 150, code: 'SUPER150' },
-  { id: 2, percent: 100, code: 'SAVE100' },
-  { id: 3, percent: 50, code: 'HALFOFF' },
-];
+import CustomerForm from './CustomerForm';
+import CouponSection from './CouponSection';
+import CheckoutSummary from './CheckoutSummary';
+import axios from 'axios';
+import { Typography } from '@mui/material';
+// import { toast } from 'react-toastify';
 
 function StepOne({
   formData,
@@ -26,36 +26,60 @@ function StepOne({
   fetchtrueAssurityCharges,
   onProceed,
 }) {
+  const navigate = useNavigate();
   const {
     service,
     createServiceCustomer,
-    customerSubmitting,
-    customerError,
     userId,
     commission,
-    coupon, loadingCoupon
+    coupon,
+    loadingCoupon
   } = useService();
+  const [customerError, setCustomerError] = useState('');
 
-  console.log("coupon details : ", coupon)
+  const [customerSubmitting, setCustomerSubmitting] = useState(false);
+  const [serviceCustomerId, setServiceCustomerId] = useState(null);
+  const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
+
+  // console.log("saved service customer : ", serviceCustomerId)
 
   const handleSaveForm = async () => {
-    const fd = new FormData();
-    fd.append("fullName", formData.name);
-    fd.append("phone", formData.phone);
-    fd.append("email", formData.email);
-    fd.append("description", formData.description);
-    fd.append("address", formData.address);
-    fd.append("city", formData.city);
-    fd.append("state", formData.state);
-    fd.append("country", formData.country);
-    fd.append("user", userId);
+    setCustomerSubmitting(true);
+    setCustomerError('');
+    try {
+      const fd = new FormData();
+      fd.append("fullName", formData.name);
+      fd.append("phone", formData.phone);
+      fd.append("email", formData.email);
+      fd.append("description", formData.description);
+      fd.append("address", formData.address);
+      fd.append("city", formData.city);
+      fd.append("state", formData.state);
+      fd.append("country", formData.country);
+      fd.append("user", userId);
 
-    const result = await createServiceCustomer(fd);
+      const customerRes = await createServiceCustomer(fd);
 
-    if (result.success) {
-      setFormSaved(true);
-    } else {
-      alert(`Failed to save: ${result.error}`);
+      // console.log("cusotmer service res: ", customerRes)
+
+      if (!customerRes.success) {
+        throw new Error(customerRes?.message || 'Failed to save customer');
+      }
+
+      // const serviceCustomerId = customerRes.data._id;
+
+
+      if (customerRes.success) {
+        setFormSaved(true);
+        setServiceCustomerId(customerRes.data._id);
+      } else {
+        setCustomerError('Failed to save customer info.');
+      }
+    } catch (err) {
+      console.error(err);
+      setCustomerError('An error occurred while saving customer info.');
+    } finally {
+      setCustomerSubmitting(false);
     }
   };
 
@@ -66,7 +90,7 @@ function StepOne({
   };
 
   const handleInputCouponApply = () => {
-    const found = coupons.find((c) => c.code === inputCoupon.toUpperCase());
+    const found = coupon.find((c) => c.code === inputCoupon.toUpperCase());
     if (found) handleApplyCoupon(found);
   };
 
@@ -84,75 +108,104 @@ function StepOne({
     );
   };
 
+  const handleProceedToCheckout = async () => {
+    if (!serviceCustomerId) {
+      alert('Please save customer information first.');
+      return;
+    }
+
+    setIsCheckoutLoading(true);
+
+    const listingPrice = service?.price ?? 0;
+    const serviceDiscount = service?.discount ?? 0;
+    const priceAfterServiceDiscount = listingPrice - (listingPrice * serviceDiscount) / 100;
+
+    const couponDiscount = coupon?.percent ?? 0;
+    const priceAfterCoupon = priceAfterServiceDiscount - (priceAfterServiceDiscount * couponDiscount) / 100;
+
+    const gst = service?.gst ?? 0;
+    const gstAmount = (priceAfterCoupon * gst) / 100;
+
+    const platformFee = commission?.[0]?.platformFee ?? 0;
+    const platformFeeAmount = (listingPrice * platformFee) / 100;
+
+    const assurityFee = commission?.[0]?.assurityfee ?? 0;
+    const assurityFeeAmount = (listingPrice * assurityFee) / 100;
+
+    const totalAmount = priceAfterCoupon + gstAmount + platformFeeAmount + assurityFeeAmount;
+
+    const checkoutData = {
+      user: userId,
+      service: service?._id,
+      serviceCustomer: serviceCustomerId,
+      provider: null,
+      serviceMan: null,
+      coupon: coupon?._id ?? null,
+
+      subtotal: listingPrice,
+      serviceDiscount,
+      couponDiscount,
+      champaignDiscount: 0,
+      gst,
+      platformFee,
+      assurityfee: assurityFee,
+
+      listingPrice,
+      serviceDiscountPrice: (listingPrice * serviceDiscount) / 100,
+      priceAfterDiscount: priceAfterServiceDiscount,
+      couponDiscountPrice: (priceAfterServiceDiscount * couponDiscount) / 100,
+      serviceGSTPrice: gstAmount,
+      platformFeePrice: platformFeeAmount,
+      assurityChargesPrice: assurityFeeAmount,
+
+      totalAmount,
+
+      termsCondition: true,
+      paymentMethod: 'cashfree',
+      walletAmount: 0,
+      otherAmount: totalAmount,
+      paidAmount: totalAmount,
+      remainingAmount: 0,
+      isPartialPayment: false,
+
+      paymentStatus: 'pending',
+      orderStatus: 'processing',
+      notes: formData.notes,
+    };
+
+    console.log("checout data : ", checkoutData)
+    try {
+      const res = await axios.post(`https://biz-booster.vercel.app/api/checkout`, checkoutData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log("response of checkout : ", res)
+      if (res?.data?.success) {
+        alert('Checkout created successfully!');
+      } else {
+        alert('Failed to create checkout.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Something went wrong while saving checkout.');
+    } finally {
+      setIsCheckoutLoading(false);
+    }
+  };
+
   return (
-    <Container className='mb-5'>
-      {!formSaved ? (
-        <Form style={{ border: '1px solid #ccc', borderRadius: '8px' }}>
-          <div className='p-3'>
-            <h3 className='text-primary'>Customer Details</h3>
-            <Row className="mb-3">
-              <Col md={6}>
-                <Form.Group controlId="name">
-                  <Form.Label>Name</Form.Label>
-                  <Form.Control placeholder="Enter your name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
-                </Form.Group>
-              </Col>
-              <Col md={6}>
-                <Form.Group controlId="phone">
-                  <Form.Label>Phone</Form.Label>
-                  <Form.Control placeholder="Enter your phone" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
-                </Form.Group>
-              </Col>
-            </Row>
-            <Row className="mb-3">
-              <Col md={6}>
-                <Form.Group controlId="email">
-                  <Form.Label>Email</Form.Label>
-                  <Form.Control placeholder="Enter your email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
-                </Form.Group>
-              </Col>
-              <Col md={6}>
-                <Form.Group controlId="description">
-                  <Form.Label>Description</Form.Label>
-                  <Form.Control placeholder="Enter your description" as="textarea" rows={1} value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
-                </Form.Group>
-              </Col>
-            </Row>
-            <Row className="mb-3">
-              <Col md={6}>
-                <Form.Group controlId="address">
-                  <Form.Label>Address</Form.Label>
-                  <Form.Control placeholder="Enter your address" value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} />
-                </Form.Group>
-              </Col>
-              <Col md={6}>
-                <Form.Group controlId="state">
-                  <Form.Label>State</Form.Label>
-                  <Form.Control placeholder="Enter your state" value={formData.state} onChange={(e) => setFormData({ ...formData, state: e.target.value })} />
-                </Form.Group>
-              </Col>
-            </Row>
-            <Row className="mb-3">
-              <Col md={6}>
-                <Form.Group controlId="city">
-                  <Form.Label>City</Form.Label>
-                  <Form.Control placeholder="Enter your city" value={formData.city} onChange={(e) => setFormData({ ...formData, city: e.target.value })} />
-                </Form.Group>
-              </Col>
-              <Col md={6}>
-                <Form.Group controlId="country">
-                  <Form.Label>Country</Form.Label>
-                  <Form.Control placeholder="Enter your country" value={formData.country} onChange={(e) => setFormData({ ...formData, country: e.target.value })} />
-                </Form.Group>
-              </Col>
-            </Row>
-            <Button onClick={handleSaveForm} disabled={customerSubmitting}>
-              {customerSubmitting ? "Saving..." : "Save Data"}
-            </Button>
-            {customerError && <p className="text-danger mt-2">{customerError}</p>}
-          </div>
-        </Form>
-      ) : (
+    <Container className='my-5'>
+      <CustomerForm
+        formData={formData}
+        setFormData={setFormData}
+        customerSubmitting={customerSubmitting}
+        customerError={customerError}
+        formSaved={formSaved}
+        handleSaveForm={handleSaveForm}
+      />
+
+      {formSaved && (
         <Container className="my-4">
           <Card className="border rounded p-4" style={{ backgroundColor: '#f8f9fa' }}>
             <h5 className="mb-4 text-primary">User Details</h5>
@@ -164,122 +217,52 @@ function StepOne({
         </Container>
       )}
 
-      {/* Coupon UI */}
-      <Box sx={{ mt: 4, p: 2, border: '1px solid #ccc', borderRadius: 2 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-          <Typography variant="h6">Best Coupon For You</Typography>
-          <Button variant="link" onClick={() => setShowAllCoupons(!showAllCoupons)}>
-            {showAllCoupons ? 'Hide All' : 'See All'}
-          </Button>
-        </Box>
-        <Typography>Extra {appliedCoupon ? appliedCoupon.percent : '00'}% off</Typography>
-        <Typography>You save an extra ₹{appliedCoupon ? appliedCoupon.percent : '00'} with this coupon</Typography>
-
-        <Row className="mt-2">
-          <Col md={9}>
-            <Form.Control
-              placeholder="Type your coupon here"
-              value={inputCoupon}
-              onChange={(e) => setInputCoupon(e.target.value)}
-              style={{ color: appliedCoupon && inputCoupon === appliedCoupon.code ? 'green' : 'black' }}
-            />
-          </Col>
-          <Col md={3}>
-            <Button onClick={handleInputCouponApply}>Apply</Button>
-          </Col>
-        </Row>
-
-        {showAllCoupons && (
-          <Box sx={{ mt: 3 }}>
-            {coupons.map((c) => (
-              <Box key={c.id} sx={{ border: '1px solid #ddd', borderRadius: 1, p: 2, mb: 2 }}>
-                <p>{c.percent}% off</p>
-                <p>You save ₹{c.percent} with this coupon</p>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span><strong>Code:</strong> <span style={{ color: 'green' }}>{c.code}</span></span>
-                  <Button variant="outline-primary" onClick={() => handleApplyCoupon(c)}>Apply Coupon</Button>
-                </Box>
-              </Box>
-            ))}
-          </Box>
-        )}
-      </Box>
-
-      {/* Checkout Summary */}
-      <Box sx={{ mt: 4, p: 3, border: '1px solid #ccc', borderRadius: 2 }}>
-        {(() => {
-          const listingPrice = service?.price ?? 0;
-          const discountPercent = service?.discount ?? 0;
-          const discountAmount = (listingPrice * discountPercent) / 100;
-          const priceAfterDiscount = listingPrice - discountAmount;
-
-          const couponPercent = appliedCoupon?.percent ?? 0;
-          const couponDiscount = (priceAfterDiscount * couponPercent) / 100;
-
-          const gstPercent = service?.gst ?? 0;
-          const gstAmount = (priceAfterDiscount * gstPercent) / 100;
-
-          const platformFeePercent = commission?.[0]?.platformFee ?? 0;
-          const platformFee = (listingPrice * platformFeePercent) / 100;
-
-          const assurityFeePercent = commission?.[0]?.assurityfee ?? 0;
-          const assurityFee = (listingPrice * assurityFeePercent) / 100;
-
-          const grandTotal = priceAfterDiscount - couponDiscount + gstAmount + platformFee + assurityFee;
-
-          return (
-            <>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Listing Price </span><span>₹{listingPrice.toFixed(2)}</span>
-              </Box>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Service Discount ({discountPercent}%)</span><span>- ₹{discountAmount.toFixed(2)}</span>
-              </Box>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Price After Discount</span><span>₹{priceAfterDiscount.toFixed(2)}</span>
-              </Box>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Coupon Discount ({couponPercent}%)</span><span>- ₹{couponDiscount.toFixed(2)}</span>
-              </Box>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Service GST ({gstPercent}%)</span><span>₹{gstAmount.toFixed(2)}</span>
-              </Box>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Platform Fee ({platformFeePercent}%)</span><span>₹{platformFee.toFixed(2)}</span>
-              </Box>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <span>Fetch True Assurity Charges ({assurityFeePercent}%)</span><span>₹{assurityFee.toFixed(2)}</span>
-              </Box>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #ccc', pt: 2 }}>
-                <Typography variant="h6">Grand Total</Typography>
-                <Typography variant="h6">₹{grandTotal.toFixed(2)}</Typography>
-              </Box>
-            </>
-          );
-        })()}
-
-      </Box>
-
-      <Form.Check
-        type="checkbox"
-        label="I agree with the terms and conditions"
-        className="mt-4"
-        id="termsCheckbox"
-        onChange={(e) => setTermsAgreed(e.target.checked)}
+      <CouponSection
+        coupons={coupon}
+        appliedCoupon={appliedCoupon}
+        inputCoupon={inputCoupon}
+        setInputCoupon={setInputCoupon}
+        setAppliedCoupon={setAppliedCoupon}
+        showAllCoupons={showAllCoupons}
+        setShowAllCoupons={setShowAllCoupons}
       />
 
-      <div className="text-center mt-4">
-        <Button
-          variant="primary"
-          onClick={() => {
-            if (typeof onProceed === 'function' && isFormValid() && termsAgreed) {
-              onProceed();
-            }
-          }}
-          disabled={!(isFormValid() && termsAgreed)}
-        >
-          Proceed
-        </Button>
+      <CheckoutSummary
+        service={service}
+        commission={commission}
+        appliedCoupon={appliedCoupon}
+      />
+
+      <div>
+        <Form.Check
+          type="checkbox"
+          label="I agree with the terms and conditions"
+          className="mt-4"
+          id="termsCheckbox"
+          onChange={(e) => setTermsAgreed(e.target.checked)}
+        />
+
+        <div className="text-center mt-4">
+          <Button
+            variant="primary"
+            onClick={async () => {
+
+              if (isFormValid() && termsAgreed) {
+                // await handleSaveForm();
+                handleProceedToCheckout();
+              }
+            }}
+            disabled={!(isFormValid() && termsAgreed)}
+          >
+            {/* {isCheckoutLoading ? <CircularProgress size={24} /> : 'Proceed to Payment'} */}
+            Proceed
+          </Button>
+          {!formSaved && (
+            <Typography variant="body2" color="error" mt={1}>
+              Please save customer info before proceeding.
+            </Typography>
+          )}
+        </div>
       </div>
     </Container>
   );
