@@ -1,4 +1,5 @@
 import { Offcanvas, Form, Button } from "react-bootstrap";
+import { useService } from "./context/ServiceContext";
 
 const ProviderSelection = ({
   show,
@@ -6,9 +7,12 @@ const ProviderSelection = ({
   handleProceed,
   service,
   providers,
-  selectedProviders,
-  setSelectedProviders
+  // selectedProviders,
+  // setSelectedProviders
 }) => {
+
+  const { selectedProviderId, setSelectedProviderId } = useService();
+
   return (
     <Offcanvas
       show={show}
@@ -52,8 +56,8 @@ const ProviderSelection = ({
             type="radio"
             name="providerOptions"
             value="fetch-true"
-            checked={selectedProviders === "fetch-true"}
-            onChange={(e) => setSelectedProviders(e.target.value)}
+            checked={selectedProviderId === "fetch-true"}
+            onChange={(e) => setSelectedProviderId(null)}
           />
         </div>
 
@@ -79,8 +83,8 @@ const ProviderSelection = ({
               type="radio"
               name="providerOptions"
               value={provider._id}
-              checked={selectedProviders === provider._id}
-              onChange={(e) => setSelectedProviders(e.target.value)}
+               checked={selectedProviderId === provider._id}
+  onChange={(e) => setSelectedProviderId(e.target.value)}
             />
           </div>
         ))}

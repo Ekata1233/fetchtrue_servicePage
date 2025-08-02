@@ -6,11 +6,12 @@ const ServiceContext = createContext();
 
 export const ServiceProvider = ({ children }) => {
   const urlParams = new URLSearchParams(window.location.search);
-  const sId = urlParams.get('serviceId') ;
+  const sId = urlParams.get('serviceId');
   const uId = urlParams.get('userId') || "";
 
   const [serviceId, setServiceId] = useState("");
   const [userId, setUserId] = useState("");
+  const [selectedProviderId, setSelectedProviderId] = useState("fetch-true"); // default
 
   console.log("service Id : ", serviceId)
   console.log("User Id : ", userId)
@@ -190,7 +191,9 @@ export const ServiceProvider = ({ children }) => {
       customerSubmitting,
       customerError,
       commission, loadingCommission,
-      coupon, loadingCoupon
+      coupon, loadingCoupon,
+      selectedProviderId,
+      setSelectedProviderId,
     }}>
       {children}
     </ServiceContext.Provider>

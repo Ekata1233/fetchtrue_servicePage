@@ -7,7 +7,7 @@ export default function StepTwo({ onProceed, checkoutId, totalAmount, formData, 
     userId,
     service,
     commission,
-    coupon,
+    coupon,selectedProviderId ,
   } = useService();
   const [paymentMethod, setPaymentMethod] = useState('');
   const [cashfreeOption, setCashfreeOption] = useState('');
@@ -15,7 +15,7 @@ export default function StepTwo({ onProceed, checkoutId, totalAmount, formData, 
   const fullAmount = totalAmount ?? 0;
   const partialAmount = Math.round(fullAmount / 2);
 
-console.log('service cusomter id : ', serviceCustomerId)
+console.log('selectedProviderId  : ', selectedProviderId )
 
   const handleProceed = async () => {
     if (!paymentMethod) {
@@ -55,7 +55,7 @@ console.log('service cusomter id : ', serviceCustomerId)
       user: userId,
       service: service?._id,
       serviceCustomer: serviceCustomerId,
-      provider: null,
+      provider: selectedProviderId ?? null,
       serviceMan: null,
       coupon: couponObj?._id ?? null,
 
