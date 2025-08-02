@@ -1,10 +1,39 @@
 // src/contexts/ServiceContext.jsx
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useId, useState } from 'react';
 import axios from 'axios';
 
 const ServiceContext = createContext();
 
 export const ServiceProvider = ({ children }) => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const sId = urlParams.get('serviceId') || "687767fb4f90fe641a20cf48";
+  const uId = urlParams.get('userId') || "";
+
+  const [serviceId, setServiceId] = useState("");
+  const [userId, setUserId] = useState("");
+
+  console.log("service Id : ", serviceId)
+  console.log("User Id : ", userId)
+
+  useEffect(() => {
+
+    if (sId) {
+      setServiceId(sId);
+      localStorage.setItem("serviceId", sId);
+    } else {
+      const storedServiceId = localStorage.getItem("serviceId");
+      if (storedServiceId) setServiceId(storedServiceId);
+    }
+
+    if (uId) {
+      setUserId(uId);
+      localStorage.setItem("userId", uId);
+    } else {
+      const storedUserId = localStorage.getItem("userId");
+      if (storedUserId) setUserId(storedUserId);
+    }
+  }, []);
+
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -25,36 +54,7 @@ export const ServiceProvider = ({ children }) => {
   const [coupon, setCoupon] = useState(null);
   const [loadingCoupon, setLoadingCoupon] = useState(true);
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const serviceId = urlParams.get('serviceId') || "687767fb4f90fe641a20cf48";
-  const userId = urlParams.get('userId') || "";
-
-  // const [serviceId, setServiceId] = useState("");
-  // const [userId, setUserId] = useState("");
-
-  // useEffect(() => {
-  //   const params = new URLSearchParams(window.location.search);
-  //   const sId = params.get('serviceId');
-  //   const uId = params.get('userId');
-
-  //   if (sId) {
-  //     setServiceId(sId);
-  //     localStorage.setItem("serviceId", sId);
-  //   } else {
-  //     const storedServiceId = localStorage.getItem("serviceId");
-  //     if (storedServiceId) setServiceId(storedServiceId);
-  //   }
-
-  //   if (uId) {
-  //     setUserId(uId);
-  //     localStorage.setItem("userId", uId);
-  //   } else {
-  //     const storedUserId = localStorage.getItem("userId");
-  //     if (storedUserId) setUserId(storedUserId);
-  //   }
-  // }, []);
-
-  // const serviceId = "";
+  console.log("service : ", service)
 
   useEffect(() => {
     if (!serviceId) return;
@@ -73,7 +73,7 @@ export const ServiceProvider = ({ children }) => {
     };
 
     fetchService();
-  }, []);
+  }, [serviceId]);
 
   useEffect(() => {
     if (!serviceId) return;
