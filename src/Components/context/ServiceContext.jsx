@@ -6,7 +6,7 @@ const ServiceContext = createContext();
 
 export const ServiceProvider = ({ children }) => {
   const urlParams = new URLSearchParams(window.location.search);
-  const sId = urlParams.get('serviceId') || "687767fb4f90fe641a20cf48";
+  const sId = urlParams.get('serviceId') ;
   const uId = urlParams.get('userId') || "";
 
   const [serviceId, setServiceId] = useState("");
@@ -16,6 +16,9 @@ export const ServiceProvider = ({ children }) => {
   console.log("User Id : ", userId)
 
   useEffect(() => {
+
+    localStorage.removeItem("serviceId");
+    localStorage.removeItem("userId");
 
     if (sId) {
       setServiceId(sId);

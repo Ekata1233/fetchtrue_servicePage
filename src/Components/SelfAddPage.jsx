@@ -88,7 +88,7 @@ const steps = ['Enter Details', 'Make Payment', 'Complete'];
 
 export default function SelfAddPage() {
   const [activeStep, setActiveStep] = useState(0);
-
+  const [serviceCustomerId, setServiceCustomerId] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -144,13 +144,19 @@ export default function SelfAddPage() {
             onProceed={handleNext}
             setCheckoutId={setCheckoutId}
             setTotalAmount={setTotalAmount}
+            setServiceCustomerId={setServiceCustomerId}
+            serviceCustomerId={serviceCustomerId}
           />
         );
       case 1:
-        return <StepTwo  onProceed={handleNext}
-            checkoutId={checkoutId}
-            totalAmount={totalAmount}
-            formData={formData} />;
+        return <StepTwo
+          onProceed={handleNext}
+          checkoutId={checkoutId}
+          totalAmount={totalAmount}
+          formData={formData}
+          serviceCustomerId={serviceCustomerId} appliedCoupon={appliedCoupon}
+
+        />;
       case 2:
         return <StepThree />;
       default:

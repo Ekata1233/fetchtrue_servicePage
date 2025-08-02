@@ -75,19 +75,19 @@ export default function StepThree() {
     <div style={styles.page}>
       <div style={styles.container}>
         <div style={styles.icon}>✅</div>
-        <div style={styles.heading}>Payment Successful!</div>
+        <div style={styles.heading}>Booking Successful!</div>
         <div style={styles.text}>
-          Thank you for your booking. Your payment has been processed successfully.
+          {/* Thank you for your booking. Your payment has been processed successfully. */}
         </div>
 
         <div style={styles.divider}></div>
 
-        <div style={styles.bookingSection}>
+        {/* <div style={styles.bookingSection}>
           <div style={styles.bookingTitle}>Booking Details</div>
           <div style={styles.bookingItem}>Booking ID : checkoutId</div>
           <div style={styles.bookingItem}>Date: August 5, 2025</div>
           <div style={styles.bookingItem}>Amount Paid: ₹1,200</div>
-        </div>
+        </div> */}
 
         <button style={styles.button} onClick={handleGoHome}>
           Go to Home

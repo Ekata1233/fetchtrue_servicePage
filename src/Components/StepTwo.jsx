@@ -1,20 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Card, Button, Form, Row, Col } from 'react-bootstrap';
+import { useService } from './context/ServiceContext';
 
-export default function StepTwo({ onProceed, checkoutId, totalAmount, formData }) {
+export default function StepTwo({ onProceed, checkoutId, totalAmount, formData, serviceCustomerId, appliedCoupon }) {
+  const {
+    userId,
+    service,
+    commission,
+    coupon,
+  } = useService();
   const [paymentMethod, setPaymentMethod] = useState('');
   const [cashfreeOption, setCashfreeOption] = useState('');
 
-  const fullAmount = totalAmount || 4999;
+  const fullAmount = totalAmount ?? 0;
   const partialAmount = Math.round(fullAmount / 2);
 
+console.log('service cusomter id : ', serviceCustomerId)
 
-  const handlePayNow = async () => {
-    if (!checkoutId) {
-      alert('Checkout ID not found.');
-      return;
-    }
-
+  const handleProceed = async () => {
     if (!paymentMethod) {
       alert('Please select a payment method.');
       return;
@@ -27,39 +30,119 @@ export default function StepTwo({ onProceed, checkoutId, totalAmount, formData }
 
     const selectedAmount = getSelectedAmount();
 
+    const listingPrice = service?.price ?? 0;
+    const serviceDiscount = service?.discount ?? 0;
+    const priceAfterServiceDiscount = listingPrice - (listingPrice * serviceDiscount) / 100;
+
+    const couponObj = appliedCoupon ?? null;
+    const couponDiscount = couponObj?.percent ?? 0;
+
+    const priceAfterCoupon = priceAfterServiceDiscount - (priceAfterServiceDiscount * couponDiscount) / 100;
+
+    const gst = service?.gst ?? 0;
+    const gstAmount = (priceAfterCoupon * gst) / 100;
+
+    const platformFee = commission?.[0]?.platformFee ?? 0;
+    const platformFeeAmount = (listingPrice * platformFee) / 100;
+
+    const assurityFee = commission?.[0]?.assurityfee ?? 0;
+    const assurityFeeAmount = (listingPrice * assurityFee) / 100;
+
+    const totalAmount = priceAfterCoupon + gstAmount + platformFeeAmount + assurityFeeAmount;
+
+
+    const checkoutData = {
+      user: userId,
+      service: service?._id,
+      serviceCustomer: serviceCustomerId,
+      provider: null,
+      serviceMan: null,
+      coupon: couponObj?._id ?? null,
+
+      subtotal: priceAfterServiceDiscount,
+      serviceDiscount,
+      couponDiscount,
+      champaignDiscount: 0,
+      gst,
+      platformFee,
+      assurityfee: assurityFee,
+
+      listingPrice,
+      serviceDiscountPrice: (listingPrice * serviceDiscount) / 100,
+      priceAfterDiscount: priceAfterServiceDiscount,
+      couponDiscountPrice: (priceAfterServiceDiscount * couponDiscount) / 100,
+      serviceGSTPrice: gstAmount,
+      platformFeePrice: platformFeeAmount,
+      assurityChargesPrice: assurityFeeAmount,
+
+      totalAmount,
+
+      termsCondition: true,
+      paymentMethod,
+      walletAmount: 0,
+      otherAmount: 0,
+      paidAmount: 0,
+      remainingAmount: 0,
+      isPartialPayment: paymentMethod === 'cashfree' && cashfreeOption === 'partial',
+
+      paymentStatus: 'pending',
+      orderStatus: 'processing',
+      notes: formData.notes,
+    };
+
     try {
-      const response = await fetch('https://biz-booster.vercel.app/api/payment/generate-payment-link', {
+      const res = await fetch('https://biz-booster.vercel.app/api/checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          orderId: `checkout_${checkoutId}`,
-          amount: selectedAmount,
-          customerId: checkoutId, // OR use userId if required
-          customerName: formData.name,
-          customerEmail: formData.email,
-          customerPhone: formData.phone,
-          checkoutId,
-        }),
+        body: JSON.stringify(checkoutData),
       });
 
-      const data = await response.json();
-      console.log("Payment API Response:", data);
+      const data = await res.json();
 
-      if (data.paymentLink) {
-        window.location.href = data.paymentLink;
+      if (data?.success && data?.data?._id) {
+        const newCheckoutId = data.data._id;
+
+        if (paymentMethod === 'cashfree') {
+          // generate payment link
+          const paymentRes = await fetch('https://biz-booster.vercel.app/api/payment/generate-payment-link', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              orderId: `checkout_${newCheckoutId}`,
+              amount: selectedAmount,
+              customerId: newCheckoutId,
+              customerName: formData.name,
+              customerEmail: formData.email,
+              customerPhone: formData.phone,
+              checkoutId: newCheckoutId,
+            }),
+          });
+
+          const paymentData = await paymentRes.json();
+
+          if (paymentData.paymentLink) {
+            window.location.href = paymentData.paymentLink;
+          } else {
+            alert('Failed to generate payment link.');
+          }
+        } else {
+          alert('Checkout saved successfully. We will contact you shortly.');
+          onProceed(); // or navigate to thank you
+        }
       } else {
-        alert('Failed to generate payment link.');
+        alert('Failed to create checkout.');
       }
     } catch (error) {
-      console.error('Payment error:', error);
-      alert('Payment initiation failed.');
+      console.error('Checkout error:', error);
+      alert('Something went wrong while creating checkout.');
     }
   };
 
 
-  // Determine displayed total based on selected option
   const getSelectedAmount = () => {
     if (paymentMethod === 'cashfree') {
       if (cashfreeOption === 'full') return fullAmount;
@@ -107,15 +190,7 @@ export default function StepTwo({ onProceed, checkoutId, totalAmount, formData }
                       checked={cashfreeOption === 'full'}
                       onChange={(e) => setCashfreeOption(e.target.value)}
                     />
-                    {/* <Form.Check
-                      type="radio"
-                      label={`Partial Payment (₹${partialAmount})`}
-                      name="cashfreeOption"
-                      value="partial"
-                      checked={cashfreeOption === 'partial'}
-                      onChange={(e) => setCashfreeOption(e.target.value)}
-                      className="mt-2"
-                    /> */}
+                    
                   </div>
                 )}
               </Card>
@@ -124,9 +199,9 @@ export default function StepTwo({ onProceed, checkoutId, totalAmount, formData }
             {/* Pay After Consultation Section */}
             <Col md={6}>
               <Card
-                className={`p-3 h-100 ${paymentMethod === 'consultation' ? 'border-primary border-2' : ''}`}
+                className={`p-3 h-100 ${paymentMethod === 'pac' ? 'border-primary border-2' : ''}`}
                 onClick={() => {
-                  setPaymentMethod('consultation');
+                  setPaymentMethod('pac');
                   setCashfreeOption('');
                 }}
                 style={{ cursor: 'pointer' }}
@@ -135,10 +210,10 @@ export default function StepTwo({ onProceed, checkoutId, totalAmount, formData }
                   type="radio"
                   label={<strong>Pay After Consultation</strong>}
                   name="paymentMethod"
-                  value="consultation"
-                  checked={paymentMethod === 'consultation'}
+                  value="pac"
+                  checked={paymentMethod === 'pac'}
                   onChange={() => {
-                    setPaymentMethod('consultation');
+                    setPaymentMethod('pac');
                     setCashfreeOption('');
                   }}
                 />
@@ -147,16 +222,21 @@ export default function StepTwo({ onProceed, checkoutId, totalAmount, formData }
             </Col>
           </Row>
 
-          {/* Total and Pay Now Button */}
+        
           <div className="text-center mt-5">
             <h5>
               Total Amount:{' '}
-              {paymentMethod === 'consultation' ? 'To be decided after consultation' : `₹${getSelectedAmount()}`}
+              {paymentMethod === 'pac' ? 'To be decided after consultation' : `₹${getSelectedAmount()}`}
             </h5>
-            <Button variant="primary" className="mt-3 px-5" onClick={handlePayNow}>
-              Pay Now
+            <Button
+              variant="primary"
+              className="mt-3 px-5"
+              onClick={handleProceed}
+            >
+              {paymentMethod === 'pac' ? 'Save' : 'Pay Now'}
             </Button>
           </div>
+
         </Form>
       </Card>
     </Container>

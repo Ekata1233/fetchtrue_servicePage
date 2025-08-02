@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Row, Col, Button, Container, Card } from 'react-bootstrap';
 import { FaCity, FaEnvelope, FaPhoneAlt, FaUser } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
@@ -27,6 +27,8 @@ function StepOne({
   onProceed,
   setCheckoutId,
   setTotalAmount,
+  setServiceCustomerId,
+  serviceCustomerId,
 }) {
   const navigate = useNavigate();
   const {
@@ -40,10 +42,9 @@ function StepOne({
   const [customerError, setCustomerError] = useState('');
 
   const [customerSubmitting, setCustomerSubmitting] = useState(false);
-  const [serviceCustomerId, setServiceCustomerId] = useState(null);
+  // const [serviceCustomerId, setServiceCustomerId] = useState(null);
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
 
-  // console.log("saved service customer : ", serviceCustomerId)
 
   const handleSaveForm = async () => {
     setCustomerSubmitting(true);
@@ -104,100 +105,33 @@ function StepOne({
     );
   };
 
-  const handleProceedToCheckout = async () => {
-    if (!serviceCustomerId) {
-      alert('Please save customer information first.');
-      return;
-    }
-
-    setIsCheckoutLoading(true);
-
+  const calculateTotalAmount = () => {
     const listingPrice = service?.price ?? 0;
     const serviceDiscount = service?.discount ?? 0;
     const priceAfterServiceDiscount = listingPrice - (listingPrice * serviceDiscount) / 100;
-    const couponDiscount = coupon?.percent ?? 0;
+
+    const couponDiscount = appliedCoupon?.percent ?? 0;
     const priceAfterCoupon = priceAfterServiceDiscount - (priceAfterServiceDiscount * couponDiscount) / 100;
+
     const gst = service?.gst ?? 0;
     const gstAmount = (priceAfterCoupon * gst) / 100;
+
     const platformFee = commission?.[0]?.platformFee ?? 0;
     const platformFeeAmount = (listingPrice * platformFee) / 100;
+
     const assurityFee = commission?.[0]?.assurityfee ?? 0;
     const assurityFeeAmount = (listingPrice * assurityFee) / 100;
+
     const totalAmount = priceAfterCoupon + gstAmount + platformFeeAmount + assurityFeeAmount;
 
-    const checkoutData = {
-      user: userId,
-      service: service?._id,
-      serviceCustomer: serviceCustomerId,
-      provider: null,
-      serviceMan: null,
-      coupon: coupon?._id ?? null,
+    setTotalAmount(Math.round(totalAmount)); // ✅ Save to parent state
+  };
 
-      subtotal: priceAfterServiceDiscount,
-      serviceDiscount,
-      couponDiscount,
-      champaignDiscount: 0,
-      gst,
-      platformFee,
-      assurityfee: assurityFee,
-
-      listingPrice,
-      serviceDiscountPrice: (listingPrice * serviceDiscount) / 100,
-      priceAfterDiscount: priceAfterServiceDiscount,
-      couponDiscountPrice: (priceAfterServiceDiscount * couponDiscount) / 100,
-      serviceGSTPrice: gstAmount,
-      platformFeePrice: platformFeeAmount,
-      assurityChargesPrice: assurityFeeAmount,
-
-      totalAmount,
-
-      termsCondition: true,
-      paymentMethod: 'pac',
-      walletAmount: 0,
-      otherAmount: 0,
-      paidAmount: 0,
-      remainingAmount: 0,
-      isPartialPayment: false,
-
-      paymentStatus: 'pending',
-      orderStatus: 'processing',
-      notes: formData.notes,
-    };
-
-    console.log("checkout data: ", checkoutData);
-
-    try {
-      const res = await axios.post(
-        'https://biz-booster.vercel.app/api/checkout',
-        checkoutData,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      console.log("checkout response: ", res);
-
-      if (res?.data?.success) {
-        alert('Checkout created successfully!');
-        setCheckoutId(res.data.data._id); // assuming response contains .data._id
-        setTotalAmount(totalAmount);
-        onProceed();
-      } else {
-        alert('Failed to create checkout.');
-      }
-    } catch (err) {
-      console.error("Checkout POST error:", err.message);
-      if (err.response) {
-        console.error("Backend responded with:", err.response.data);
-      }
-      alert('Something went wrong while saving checkout.');
-    } finally {
-      setIsCheckoutLoading(false);
+  useEffect(() => {
+    if (formSaved && service && commission) {
+      calculateTotalAmount();
     }
-  }
-
+  }, [formSaved, appliedCoupon, service, commission]);
 
   return (
     <Container className='my-5'>
@@ -253,8 +187,8 @@ function StepOne({
             onClick={async () => {
 
               if (isFormValid() && termsAgreed) {
-                // await handleSaveForm();
-                handleProceedToCheckout();
+
+                onProceed();
               }
             }}
             disabled={!(isFormValid() && termsAgreed)}
