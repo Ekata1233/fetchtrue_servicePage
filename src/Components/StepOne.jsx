@@ -133,7 +133,7 @@ function StepOne({
       serviceMan: null,
       coupon: coupon?._id ?? null,
 
-      subtotal: listingPrice,
+      subtotal: priceAfterServiceDiscount,
       serviceDiscount,
       couponDiscount,
       champaignDiscount: 0,
@@ -154,8 +154,8 @@ function StepOne({
       termsCondition: true,
       paymentMethod: 'pac',
       walletAmount: 0,
-      otherAmount: totalAmount,
-      paidAmount: totalAmount,
+      otherAmount: 0,
+      paidAmount: 0,
       remainingAmount: 0,
       isPartialPayment: false,
 

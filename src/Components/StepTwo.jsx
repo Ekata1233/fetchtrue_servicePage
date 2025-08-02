@@ -107,7 +107,7 @@ export default function StepTwo({ onProceed, checkoutId, totalAmount, formData }
                       checked={cashfreeOption === 'full'}
                       onChange={(e) => setCashfreeOption(e.target.value)}
                     />
-                    <Form.Check
+                    {/* <Form.Check
                       type="radio"
                       label={`Partial Payment (₹${partialAmount})`}
                       name="cashfreeOption"
@@ -115,7 +115,7 @@ export default function StepTwo({ onProceed, checkoutId, totalAmount, formData }
                       checked={cashfreeOption === 'partial'}
                       onChange={(e) => setCashfreeOption(e.target.value)}
                       className="mt-2"
-                    />
+                    /> */}
                   </div>
                 )}
               </Card>
