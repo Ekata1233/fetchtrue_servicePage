@@ -55,7 +55,7 @@ console.log('selectedProviderId  : ', selectedProviderId )
       user: userId,
       service: service?._id,
       serviceCustomer: serviceCustomerId,
-      provider: selectedProviderId ?? null,
+      provider: selectedProviderId === 'fetch-true' ? null : selectedProviderId,
       serviceMan: null,
       coupon: couponObj?._id ?? null,
 

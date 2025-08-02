@@ -57,7 +57,7 @@ const ProviderSelection = ({
             name="providerOptions"
             value="fetch-true"
             checked={selectedProviderId === "fetch-true"}
-            onChange={(e) => setSelectedProviderId(null)}
+            onChange={(e) => setSelectedProviderId(e.target.value)}
           />
         </div>
 
