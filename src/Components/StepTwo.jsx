@@ -42,8 +42,8 @@ export default function StepTwo({ onProceed, checkoutId, totalAmount, formData, 
     const gst = service?.gst ?? 0;
     const gstAmount = (priceAfterCoupon * gst) / 100;
 
-    const platformFee = commission?.[0]?.platformFee ?? 0;
-    const platformFeeAmount = (listingPrice * platformFee) / 100;
+    // const platformFee = commission?.[0]?.platformFee ?? 0;
+    const platformFeeAmount = commission?.[0]?.platformFee ?? 0;
 
     const assurityFee = commission?.[0]?.assurityfee ?? 0;
     const assurityFeeAmount = (listingPrice * assurityFee) / 100;
