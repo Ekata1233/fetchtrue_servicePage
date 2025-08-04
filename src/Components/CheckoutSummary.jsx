@@ -30,8 +30,9 @@ const CheckoutSummary = ({ service, commission, appliedCoupon }) => {
   const gstPercent = service?.gst ?? 0;
   const gstAmount = (priceAfterDiscount * gstPercent) / 100;
 
-  const platformFeePercent = commission?.[0]?.platformFee ?? 0;
-  const platformFee = (listingPrice * platformFeePercent) / 100;
+  // const platformFeePercent = commission?.[0]?.platformFee ?? 0;
+  // const platformFee = (listingPrice * platformFeePercent) / 100;
+  const platformFee = commission?.[0]?.platformFee ?? 0;
 
   const assurityFeePercent = commission?.[0]?.assurityfee ?? 0;
   const assurityFee = (listingPrice * assurityFeePercent) / 100;
@@ -59,8 +60,9 @@ const CheckoutSummary = ({ service, commission, appliedCoupon }) => {
         <span>Service GST ({gstPercent}%)</span><span>₹{gstAmount.toFixed(2)}</span>
       </Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <span>Platform Fee ({platformFeePercent}%)</span><span>₹{platformFee.toFixed(2)}</span>
+        <span>Platform Fee</span><span>₹{platformFee.toFixed(2)}</span>
       </Box>
+
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
         <span>Fetch True Assurity Charges ({assurityFeePercent}%)</span><span>₹{assurityFee.toFixed(2)}</span>
       </Box>
