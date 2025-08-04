@@ -107,24 +107,38 @@ function StepOne({
 
   const calculateTotalAmount = () => {
     const listingPrice = service?.price ?? 0;
-    const serviceDiscount = service?.discount ?? 0;
-    const priceAfterServiceDiscount = listingPrice - (listingPrice * serviceDiscount) / 100;
+  const discountPercent = service?.discount ?? 0;
+  const discountAmount = (listingPrice * discountPercent) / 100;
+  const priceAfterDiscount = listingPrice - discountAmount;
 
-    const couponDiscount = appliedCoupon?.percent ?? 0;
-    const priceAfterCoupon = priceAfterServiceDiscount - (priceAfterServiceDiscount * couponDiscount) / 100;
+  // COUPON DISCOUNT
+  let couponDiscount = 0;
+  if (appliedCoupon) {
+    if (appliedCoupon.discountAmountType === 'Percentage') {
+      const rawDiscount = (appliedCoupon.amount / 100) * priceAfterDiscount;
+      couponDiscount = appliedCoupon.maxDiscount
+        ? Math.min(rawDiscount, appliedCoupon.maxDiscount)
+        : rawDiscount;
+    } else {
+      couponDiscount = appliedCoupon.amount;
+    }
+  }
 
-    const gst = service?.gst ?? 0;
-    const gstAmount = (priceAfterCoupon * gst) / 100;
+  const priceAfterCoupon = priceAfterDiscount - couponDiscount;
 
-    const platformFee = commission?.[0]?.platformFee ?? 0;
-    const platformFeeAmount = (listingPrice * platformFee) / 100;
+  const gstPercent = service?.gst ?? 0;
+  const gstAmount = (priceAfterDiscount * gstPercent) / 100;
 
-    const assurityFee = commission?.[0]?.assurityfee ?? 0;
-    const assurityFeeAmount = (listingPrice * assurityFee) / 100;
+  const platformFee = commission?.[0]?.platformFee ?? 0; // Flat amount
 
-    const totalAmount = priceAfterCoupon + gstAmount + platformFeeAmount + assurityFeeAmount;
+  const assurityFeePercent = commission?.[0]?.assurityfee ?? 0;
+  const assurityFee = (listingPrice * assurityFeePercent) / 100;
 
-    setTotalAmount(Math.round(totalAmount)); // ✅ Save to parent state
+  const grandTotal = priceAfterDiscount - couponDiscount + gstAmount + platformFee + assurityFee;
+
+  console.log("Final Grand Total in StepOne:", grandTotal);
+
+  setTotalAmount(Math.round(grandTotal));
   };
 
   useEffect(() => {

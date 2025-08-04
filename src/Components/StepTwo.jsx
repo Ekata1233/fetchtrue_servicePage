@@ -11,6 +11,7 @@ export default function StepTwo({ onProceed, checkoutId, totalAmount, formData, 
   } = useService();
   const [paymentMethod, setPaymentMethod] = useState('');
   const [cashfreeOption, setCashfreeOption] = useState('');
+  console.log('seelected coupon I d; ', coupon)
 
   const fullAmount = totalAmount ?? 0;
   const partialAmount = Math.round(fullAmount / 2);
@@ -31,24 +32,36 @@ export default function StepTwo({ onProceed, checkoutId, totalAmount, formData, 
     const selectedAmount = getSelectedAmount();
 
     const listingPrice = service?.price ?? 0;
-    const serviceDiscount = service?.discount ?? 0;
-    const priceAfterServiceDiscount = listingPrice - (listingPrice * serviceDiscount) / 100;
+    const discountPercent = service?.discount ?? 0;
+    const discountAmount = (listingPrice * discountPercent) / 100;
+    const priceAfterDiscount = listingPrice - discountAmount;
 
     const couponObj = appliedCoupon ?? null;
-    const couponDiscount = couponObj?.percent ?? 0;
 
-    const priceAfterCoupon = priceAfterServiceDiscount - (priceAfterServiceDiscount * couponDiscount) / 100;
+    // Coupon logic with maxDiscount and amountType
+    let couponDiscountAmount = 0;
+    let couponDiscountPercent = 0;
 
-    const gst = service?.gst ?? 0;
-    const gstAmount = (priceAfterCoupon * gst) / 100;
+    if (couponObj) {
+      if (couponObj.discountAmountType === 'Percentage') {
+        const rawDiscount = (couponObj.amount / 100) * priceAfterDiscount;
+        couponDiscountAmount = couponObj.maxDiscount
+          ? Math.min(rawDiscount, couponObj.maxDiscount)
+          : rawDiscount;
+        couponDiscountPercent = couponObj.amount;
+      } else {
+        couponDiscountAmount = couponObj.amount;
+      }
+    }
 
-    // const platformFee = commission?.[0]?.platformFee ?? 0;
+    const gstPercent = service?.gst ?? 0;
+    const gstAmount = (priceAfterDiscount * gstPercent) / 100;
+
     const platformFeeAmount = commission?.[0]?.platformFee ?? 0;
+    const assurityFeePercent = commission?.[0]?.assurityfee ?? 0;
+    const assurityFeeAmount = (listingPrice * assurityFeePercent) / 100;
 
-    const assurityFee = commission?.[0]?.assurityfee ?? 0;
-    const assurityFeeAmount = (listingPrice * assurityFee) / 100;
-
-    const totalAmount = priceAfterCoupon + gstAmount + platformFeeAmount + assurityFeeAmount;
+    const totalAmount = priceAfterDiscount - couponDiscountAmount + gstAmount + platformFeeAmount + assurityFeeAmount;
 
 
     const checkoutData = {
@@ -59,18 +72,18 @@ export default function StepTwo({ onProceed, checkoutId, totalAmount, formData, 
       serviceMan: null,
       coupon: couponObj?._id ?? null,
 
-      subtotal: priceAfterServiceDiscount,
-      serviceDiscount,
-      couponDiscount,
+      subtotal: priceAfterDiscount,
+      serviceDiscount: discountPercent,
+      couponDiscount: couponDiscountPercent,
       champaignDiscount: 0,
-      gst,
-      platformFee,
-      assurityfee: assurityFee,
+      gst: gstPercent,
+      platformFeeAmount,
+      assurityfee: assurityFeePercent,
 
       listingPrice,
-      serviceDiscountPrice: (listingPrice * serviceDiscount) / 100,
-      priceAfterDiscount: priceAfterServiceDiscount,
-      couponDiscountPrice: (priceAfterServiceDiscount * couponDiscount) / 100,
+      serviceDiscountPrice: discountAmount,
+      priceAfterDiscount,
+      couponDiscountPrice: couponDiscountAmount,
       serviceGSTPrice: gstAmount,
       platformFeePrice: platformFeeAmount,
       assurityChargesPrice: assurityFeeAmount,
@@ -89,7 +102,7 @@ export default function StepTwo({ onProceed, checkoutId, totalAmount, formData, 
       orderStatus: 'processing',
       notes: formData.notes,
     };
-
+    console.log("total amoutn in step two : ", totalAmount)
     try {
       const res = await fetch('https://biz-booster.vercel.app/api/checkout', {
         method: 'POST',

@@ -108,6 +108,8 @@ export default function SelfAddPage() {
   const [inputCoupon, setInputCoupon] = useState('');
   const [termsAgreed, setTermsAgreed] = useState(false);
 
+  console.log("total amount inf self  : ", totalAmount)
+
   const trueAssurityCharges = 17;
 
   const handleNext = () => {
