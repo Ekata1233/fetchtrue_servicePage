@@ -11,7 +11,22 @@ const ProviderSelection = ({
   // setSelectedProviders
 }) => {
 
-  const { selectedProviderId, setSelectedProviderId } = useService();
+  const { selectedProviderId, setSelectedProviderId, providerReviews } = useService();
+
+  const getProviderRatingSummary = (providerId) => {
+    const providerReviewsList = providerReviews.reviews.filter(r => r.provider === providerId);
+    if (providerReviewsList.length === 0) return null;
+
+    const avg =
+      providerReviewsList.reduce((acc, r) => acc + r.rating, 0) /
+      providerReviewsList.length;
+
+    return {
+      averageRating: avg.toFixed(1),
+      total: providerReviewsList.length,
+    };
+  };
+
 
   return (
     <Offcanvas
@@ -49,7 +64,7 @@ const ProviderSelection = ({
               <div style={{ textDecoration: "line-through", color: "#666" }}>₹{service?.price}</div>
               <div className="fw-bold">₹{service?.discountedPrice}</div>
               <div className="badge bg-success-subtle text-success border border-success">{service?.discount}% OFF</div>
-              <div className="badge bg-success-subtle text-success border border-success">{service?.franchiseDetails?.commission || "0%"} Commission</div>
+
             </div>
           </div>
           <Form.Check
@@ -76,15 +91,25 @@ const ProviderSelection = ({
                 <div style={{ textDecoration: "line-through", color: "#888" }}>₹{service?.price}</div>
                 <div className="fw-bold text-dark">₹{service?.discountedPrice}</div>
                 <div className="badge bg-success-subtle text-success border border-success">{service?.discount}% OFF</div>
-                <div className="badge bg-success-subtle text-success border border-success">{service?.franchiseDetails?.commission || "0%"} Commission</div>
+                {/*provider reviews */}
+                {(() => {
+                  const summary = getProviderRatingSummary(provider._id);
+                  return summary ? (
+                    <div className="text-muted small">
+                      ⭐ {summary.averageRating} ({summary.total} reviews)
+                    </div>
+                  ) : (
+                    <div className="text-muted small">No reviews yet</div>
+                  );
+                })()}
               </div>
             </div>
             <Form.Check
               type="radio"
               name="providerOptions"
               value={provider._id}
-               checked={selectedProviderId === provider._id}
-  onChange={(e) => setSelectedProviderId(e.target.value)}
+              checked={selectedProviderId === provider._id}
+              onChange={(e) => setSelectedProviderId(e.target.value)}
             />
           </div>
         ))}

@@ -7,7 +7,7 @@ export default function StepTwo({ onProceed, checkoutId, totalAmount, formData, 
     userId,
     service,
     commission,
-    coupon,selectedProviderId ,
+    coupon, selectedProviderId,
   } = useService();
   const [paymentMethod, setPaymentMethod] = useState('');
   const [cashfreeOption, setCashfreeOption] = useState('');
@@ -15,7 +15,7 @@ export default function StepTwo({ onProceed, checkoutId, totalAmount, formData, 
   const fullAmount = totalAmount ?? 0;
   const partialAmount = Math.round(fullAmount / 2);
 
-console.log('selectedProviderId  : ', selectedProviderId )
+  console.log('selectedProviderId  : ', selectedProviderId)
 
   const handleProceed = async () => {
     if (!paymentMethod) {
@@ -190,8 +190,17 @@ console.log('selectedProviderId  : ', selectedProviderId )
                       checked={cashfreeOption === 'full'}
                       onChange={(e) => setCashfreeOption(e.target.value)}
                     />
-                    
+                    <Form.Check
+                      type="radio"
+                      label={`Partial Payment (₹${partialAmount})`}
+                      name="cashfreeOption"
+                      value="partial"
+                      checked={cashfreeOption === 'partial'}
+                      onChange={(e) => setCashfreeOption(e.target.value)}
+                      className="mt-2"
+                    />
                   </div>
+
                 )}
               </Card>
             </Col>
@@ -222,7 +231,7 @@ console.log('selectedProviderId  : ', selectedProviderId )
             </Col>
           </Row>
 
-        
+
           <div className="text-center mt-5">
             <h5>
               Total Amount:{' '}

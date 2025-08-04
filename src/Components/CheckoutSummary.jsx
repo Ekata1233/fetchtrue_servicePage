@@ -7,8 +7,25 @@ const CheckoutSummary = ({ service, commission, appliedCoupon }) => {
   const discountAmount = (listingPrice * discountPercent) / 100;
   const priceAfterDiscount = listingPrice - discountAmount;
 
-  const couponPercent = appliedCoupon?.percent ?? 0;
-  const couponDiscount = (priceAfterDiscount * couponPercent) / 100;
+
+  // ✅ COUPON LOGIC MATCHING BACKEND
+  let couponDiscount = 0;
+  let couponLabel = '';
+
+  if (appliedCoupon) {
+    if (appliedCoupon.discountAmountType === 'Percentage') {
+      const rawDiscount = (appliedCoupon.amount / 100) * priceAfterDiscount;
+      couponDiscount = appliedCoupon.maxDiscount
+        ? Math.min(rawDiscount, appliedCoupon.maxDiscount)
+        : rawDiscount;
+      couponLabel = `${appliedCoupon.amount}%`;
+    } else {
+      couponDiscount = appliedCoupon.amount;
+      couponLabel = `₹${appliedCoupon.amount}`;
+    }
+  }
+
+  const priceAfterCoupon = priceAfterDiscount - couponDiscount;
 
   const gstPercent = service?.gst ?? 0;
   const gstAmount = (priceAfterDiscount * gstPercent) / 100;
@@ -32,9 +49,12 @@ const CheckoutSummary = ({ service, commission, appliedCoupon }) => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         <span>Price After Discount</span><span>₹{priceAfterDiscount.toFixed(2)}</span>
       </Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <span>Coupon Discount ({couponPercent}%)</span><span>- ₹{couponDiscount.toFixed(2)}</span>
-      </Box>
+      {appliedCoupon && (
+        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <span>Coupon Discount ({couponLabel})</span>
+          <span>- ₹{couponDiscount.toFixed(2)}</span>
+        </Box>
+      )}
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         <span>Service GST ({gstPercent}%)</span><span>₹{gstAmount.toFixed(2)}</span>
       </Box>

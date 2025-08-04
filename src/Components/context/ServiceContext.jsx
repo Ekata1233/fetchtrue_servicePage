@@ -6,12 +6,12 @@ const ServiceContext = createContext();
 
 export const ServiceProvider = ({ children }) => {
   const urlParams = new URLSearchParams(window.location.search);
-  const sId = urlParams.get('serviceId');
+  const sId = urlParams.get('serviceId') ;
   const uId = urlParams.get('userId') || "";
 
   const [serviceId, setServiceId] = useState("");
   const [userId, setUserId] = useState("");
-  const [selectedProviderId, setSelectedProviderId] = useState("fetch-true"); // default
+const [selectedProviderId, setSelectedProviderId] = useState("fetch-true"); // default
 
   console.log("service Id : ", serviceId)
   console.log("User Id : ", userId)
@@ -48,6 +48,14 @@ export const ServiceProvider = ({ children }) => {
 
   const [providers, setProviders] = useState([]); // 🔥 New: providers subscribed to this service
   const [providersLoading, setProvidersLoading] = useState(true);
+
+  const [providerReviews, setProviderReviews] = useState({
+  reviews: [],
+  averageRating: 0,
+  ratingDistribution: {},
+  totalReviews: 0
+});
+
 
   const [customerSubmitting, setCustomerSubmitting] = useState(false);
   const [customerError, setCustomerError] = useState(null);
@@ -178,6 +186,37 @@ export const ServiceProvider = ({ children }) => {
     fetchCoupon();
   }, []);
 
+  useEffect(() => {
+  const fetchReviews = async () => {
+    try {
+      const res = await axios.get(`https://biz-booster.vercel.app/api/provider/review`);
+      if (res.data.success) {
+        const reviews = res.data.reviews || [];
+
+        const ratings = reviews.map(r => r.rating);
+        const averageRating = ratings.length ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1) : 0;
+
+        const ratingDistribution = [1, 2, 3, 4, 5].reduce((acc, star) => {
+          acc[star] = ratings.filter(r => r === star).length;
+          return acc;
+        }, {});
+
+        setProviderReviews({
+          reviews,
+          averageRating,
+          ratingDistribution,
+          totalReviews: ratings.length
+        });
+      }
+    } catch (err) {
+      console.error("Failed to fetch reviews:", err);
+    }
+  };
+
+  fetchReviews();
+}, []);
+
+
 
   return (
     <ServiceContext.Provider value={{
@@ -191,9 +230,7 @@ export const ServiceProvider = ({ children }) => {
       customerSubmitting,
       customerError,
       commission, loadingCommission,
-      coupon, loadingCoupon,
-      selectedProviderId,
-      setSelectedProviderId,
+      coupon, loadingCoupon,providerReviews
     }}>
       {children}
     </ServiceContext.Provider>
