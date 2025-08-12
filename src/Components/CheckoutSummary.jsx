@@ -1,11 +1,24 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
+import { useService } from './context/ServiceContext';
 
 const CheckoutSummary = ({ service, commission, appliedCoupon }) => {
-  const listingPrice = service?.price ?? 0;
-  const discountPercent = service?.discount ?? 0;
+
+  const { selectedProviderId
+  } = useService();
+
+
+
+  const providerPriceInfo = service?.providerPrices?.find(
+    (p) => p.provider === selectedProviderId
+  );
+
+  const listingPrice = Number(providerPriceInfo?.providerMRP ?? service?.price ?? 0);
+  const discountPercent = Number(providerPriceInfo?.providerDiscount ?? service?.discount ?? 0);
   const discountAmount = (listingPrice * discountPercent) / 100;
-  const priceAfterDiscount = listingPrice - discountAmount;
+  const priceAfterDiscount =
+    Number(providerPriceInfo?.providerPrice) || (listingPrice - discountAmount);
+
 
 
   // ✅ COUPON LOGIC MATCHING BACKEND

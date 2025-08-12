@@ -37,7 +37,7 @@ function StepOne({
     userId,
     commission,
     coupon,
-    loadingCoupon
+    loadingCoupon, selectedProviderId
   } = useService();
   const [customerError, setCustomerError] = useState('');
 
@@ -45,6 +45,7 @@ function StepOne({
   // const [serviceCustomerId, setServiceCustomerId] = useState(null);
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
 
+  console.log("selectedProviderId : ", selectedProviderId)
 
   const handleSaveForm = async () => {
     setCustomerSubmitting(true);
@@ -104,42 +105,68 @@ function StepOne({
       description.trim() !== ''
     );
   };
+  console.log('service data : ', service)
+  console.log('selected provider Id  : ', selectedProviderId)
+  console.log("p.provider TYPE:", typeof service?.providerPrices?.[0]?.provider, service?.providerPrices?.[0]?.provider);
+  console.log("selectedProviderId TYPE:", typeof selectedProviderId, selectedProviderId);
 
-  const calculateTotalAmount = () => {
-    const listingPrice = service?.price ?? 0;
-  const discountPercent = service?.discount ?? 0;
-  const discountAmount = (listingPrice * discountPercent) / 100;
-  const priceAfterDiscount = listingPrice - discountAmount;
+  const calculateTotalAmount = (selectedProviderId) => {
 
-  // COUPON DISCOUNT
-  let couponDiscount = 0;
-  if (appliedCoupon) {
-    if (appliedCoupon.discountAmountType === 'Percentage') {
-      const rawDiscount = (appliedCoupon.amount / 100) * priceAfterDiscount;
-      couponDiscount = appliedCoupon.maxDiscount
-        ? Math.min(rawDiscount, appliedCoupon.maxDiscount)
-        : rawDiscount;
-    } else {
-      couponDiscount = appliedCoupon.amount;
+    if (!service?.providerPrices?.length || !selectedProviderId) {
+      console.warn("Service data or selected provider not ready yet");
+      return;
     }
-  }
 
-  const priceAfterCoupon = priceAfterDiscount - couponDiscount;
+    const providerPriceInfo = service.providerPrices.find(
+      (p) => p.provider === selectedProviderId
+    );
 
-  const gstPercent = service?.gst ?? 0;
-  const gstAmount = (priceAfterDiscount * gstPercent) / 100;
+    console.log("provider price info:", providerPriceInfo);
 
-  const platformFee = commission?.[0]?.platformFee ?? 0; // Flat amount
 
-  const assurityFeePercent = commission?.[0]?.assurityfee ?? 0;
-  const assurityFee = (listingPrice * assurityFeePercent) / 100;
 
-  const grandTotal = priceAfterDiscount - couponDiscount + gstAmount + platformFee + assurityFee;
+    const listingPrice = providerPriceInfo?.providerMRP ?? service?.price ?? 0;
+    const discountPercent = providerPriceInfo?.providerDiscount ?? service?.discount ?? 0;
+    const discountAmount = (listingPrice * discountPercent) / 100;
+    const priceAfterDiscount = providerPriceInfo?.providerPrice ?? (listingPrice - discountAmount);
 
-  console.log("Final Grand Total in StepOne:", grandTotal);
+    console.log("price after discoutn : ", priceAfterDiscount)
 
-  setTotalAmount(Math.round(grandTotal));
+    // COUPON DISCOUNT
+    let couponDiscount = 0;
+    if (appliedCoupon) {
+      if (appliedCoupon.discountAmountType === 'Percentage') {
+        const rawDiscount = (appliedCoupon.amount / 100) * priceAfterDiscount;
+        couponDiscount = appliedCoupon.maxDiscount
+          ? Math.min(rawDiscount, appliedCoupon.maxDiscount)
+          : rawDiscount;
+      } else {
+        couponDiscount = appliedCoupon.amount;
+      }
+    }
+
+    const priceAfterCoupon = priceAfterDiscount - couponDiscount;
+    const gstPercent = service?.gst ?? 0;
+    const gstAmount = (priceAfterDiscount * gstPercent) / 100;
+    const platformFee = commission?.[0]?.platformFee ?? 0;
+    const assurityFeePercent = commission?.[0]?.assurityfee ?? 0;
+    const assurityFee = (listingPrice * assurityFeePercent) / 100;
+    const grandTotal = priceAfterDiscount - couponDiscount + gstAmount + platformFee + assurityFee;
+
+    console.log("Final Grand Total in StepOne:", grandTotal);
+
+    setTotalAmount(Math.round(grandTotal));
   };
+
+  useEffect(() => {
+    calculateTotalAmount()
+  }, [])
+useEffect(() => {
+  if (service?.providerPrices?.length && selectedProviderId) {
+    calculateTotalAmount(selectedProviderId);
+  }
+}, [service, selectedProviderId]);
+
 
   useEffect(() => {
     if (formSaved && service && commission) {

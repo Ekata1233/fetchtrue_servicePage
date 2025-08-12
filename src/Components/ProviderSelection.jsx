@@ -7,8 +7,6 @@ const ProviderSelection = ({
   handleProceed,
   service,
   providers,
-  // selectedProviders,
-  // setSelectedProviders
 }) => {
 
   const { selectedProviderId, setSelectedProviderId, providerReviews } = useService();
@@ -77,7 +75,7 @@ const ProviderSelection = ({
         </div>
 
         {/* Dynamic Providers */}
-        {providers.map((provider, index) => (
+        {/* {providers.map((provider, index) => (
           <div
             key={provider._id || index}
             className="d-flex align-items-center justify-content-between mb-3 p-3 rounded shadow-sm bg-white border"
@@ -91,7 +89,6 @@ const ProviderSelection = ({
                 <div style={{ textDecoration: "line-through", color: "#888" }}>₹{service?.price}</div>
                 <div className="fw-bold text-dark">₹{service?.discountedPrice}</div>
                 <div className="badge bg-success-subtle text-success border border-success">{service?.discount}% OFF</div>
-                {/*provider reviews */}
                 {(() => {
                   const summary = getProviderRatingSummary(provider._id);
                   return summary ? (
@@ -112,7 +109,85 @@ const ProviderSelection = ({
               onChange={(e) => setSelectedProviderId(e.target.value)}
             />
           </div>
-        ))}
+        ))} */}
+
+        {providers.map((provider, index) => {
+          const providerPriceInfo = service?.providerPrices?.find(
+            (p) => p.provider === provider._id
+          );
+
+          // If provider-specific price exists, use that, otherwise fallback to global
+          const originalPrice = providerPriceInfo?.providerMRP || service?.price;
+          const discountedPrice = providerPriceInfo?.providerPrice || service?.discountedPrice;
+
+          // Calculate discount %
+          const discountPercent = providerPriceInfo
+            ? Math.round(((originalPrice - discountedPrice) / originalPrice) * 100)
+            : service?.discount;
+
+          return (
+            <div
+              key={provider._id || index}
+              className="d-flex align-items-center justify-content-between mb-3 p-3 rounded shadow-sm bg-white border"
+            >
+              <div
+                className="p-1 bg-light rounded-circle border me-3"
+                style={{
+                  width: "60px",
+                  height: "60px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <img
+                  src={provider?.storeInfo?.logo || "/provider.jpg"}
+                  alt={provider.fullName}
+                  style={{
+                    width: "50px",
+                    height: "50px",
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                  }}
+                />
+              </div>
+              <div className="flex-grow-1">
+                <h6 className="mb-1 fw-bold">
+                  {provider.fullName} [ {provider?.storeInfo?.storeName} ]
+                </h6>
+                <div className="d-flex flex-wrap align-items-center gap-3">
+                  <div style={{ textDecoration: "line-through", color: "#888" }}>
+                    ₹{originalPrice}
+                  </div>
+                  <div className="fw-bold text-dark">₹{discountedPrice}</div>
+                  <div className="badge bg-success-subtle text-success border border-success">
+                    {discountPercent}% OFF
+                  </div>
+
+                  {/* Provider reviews */}
+                  {(() => {
+                    const summary = getProviderRatingSummary(provider._id);
+                    return summary ? (
+                      <div className="text-muted small">
+                        ⭐ {summary.averageRating} ({summary.total} reviews)
+                      </div>
+                    ) : (
+                      <div className="text-muted small">No reviews yet</div>
+                    );
+                  })()}
+                </div>
+              </div>
+              <Form.Check
+                type="radio"
+                name="providerOptions"
+                value={provider._id}
+                checked={selectedProviderId === provider._id}
+                onChange={(e) => setSelectedProviderId(e.target.value)}
+              />
+            </div>
+          );
+        })}
+
 
         <div className="d-flex justify-content-end gap-2 mt-4">
           <Button variant="secondary" onClick={handleClose}>Cancel</Button>

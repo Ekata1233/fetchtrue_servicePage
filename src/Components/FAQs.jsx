@@ -66,8 +66,6 @@ function FAQs() {
           handleProceed={handleProceed}
           service={service}
           providers={providers}
-          // selectedProviders={selectedProviders}
-          // setSelectedProviders={setSelectedProviders}
         />
       </Container>
     </div>
