@@ -48,7 +48,7 @@ const CheckoutSummary = ({ service, commission, appliedCoupon }) => {
   const platformFee = commission?.[0]?.platformFee ?? 0;
 
   const assurityFeePercent = commission?.[0]?.assurityfee ?? 0;
-  const assurityFee = (listingPrice * assurityFeePercent) / 100;
+  const assurityFee = (priceAfterDiscount * assurityFeePercent) / 100;
 
   const grandTotal = priceAfterDiscount - couponDiscount + gstAmount + platformFee + assurityFee;
 
