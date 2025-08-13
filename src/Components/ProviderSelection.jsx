@@ -153,7 +153,7 @@ const ProviderSelection = ({
               </div>
               <div className="flex-grow-1">
                 <h6 className="mb-1 fw-bold">
-                  {provider.fullName} [ {provider?.storeInfo?.storeName} ]
+                  {provider?.storeInfo?.storeName} 
                 </h6>
                 <div className="d-flex flex-wrap align-items-center gap-3">
                   <div style={{ textDecoration: "line-through", color: "#888" }}>
