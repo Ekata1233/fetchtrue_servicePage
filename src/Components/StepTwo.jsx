@@ -11,12 +11,10 @@ export default function StepTwo({ onProceed, checkoutId, totalAmount, formData, 
   } = useService();
   const [paymentMethod, setPaymentMethod] = useState('');
   const [cashfreeOption, setCashfreeOption] = useState('');
-  console.log('seelected coupon I d; ', coupon)
 
   const fullAmount = totalAmount ?? 0;
   const partialAmount = Math.round(fullAmount / 2);
 
-  console.log('selectedProviderId  : ', selectedProviderId)
 
   const handleProceed = async () => {
     if (!paymentMethod) {
@@ -40,6 +38,10 @@ export default function StepTwo({ onProceed, checkoutId, totalAmount, formData, 
     const discountAmount = (listingPrice * discountPercent) / 100;
     const priceAfterDiscount =
       Number(providerPriceInfo?.providerPrice) || (listingPrice - discountAmount);
+
+      const providerCommission = providerPriceInfo?.providerCommission ?? null;
+
+      console.log("privdier ocmmission : ", providerCommission)
 
     const couponObj = appliedCoupon ?? null;
 
@@ -93,6 +95,8 @@ export default function StepTwo({ onProceed, checkoutId, totalAmount, formData, 
       serviceGSTPrice: gstAmount,
       platformFeePrice: platformFeeAmount,
       assurityChargesPrice: assurityFeeAmount,
+
+      commission:providerCommission ,
 
       totalAmount,
 
@@ -254,7 +258,7 @@ export default function StepTwo({ onProceed, checkoutId, totalAmount, formData, 
           <div className="text-center mt-5">
             <h5>
               Total Amount:{' '}
-              {paymentMethod === 'pac' ? 'To be decided after consultation' : `₹${getSelectedAmount()}`}
+              {paymentMethod === 'pac' ? 'Pay after consultation' : `₹${getSelectedAmount()}`}
             </h5>
             <Button
               variant="primary"
