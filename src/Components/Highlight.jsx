@@ -11,20 +11,21 @@ const Hightlight = () => {
   return (
     <div className="mx-2 mx-lg-5 mb-4">
       <hr />
-      <h5 className="fw-bold py-2" style={{ textDecoration: "underline" }}>Highlights</h5>
+      <h5 className="fw-bold py-2" style={{ textDecoration: "underline" }}>Highlivgfgfgfgfgfgghts</h5>
 
       {Array.isArray(highlights) && highlights.length > 0 ? (
-        <div className="row">
-          {highlights.map((img, index) => (
-            <div className="col-6 col-md-4 col-lg-3 mb-3" key={index}>
-              <img
-                src={img}
-                alt={`Highlight ${index + 1}`}
-                className="img-fluid rounded shadow-sm"
-              />
-            </div>
-          ))}
-        </div>
+       <div className="row">
+  {highlights.map((img, index) => (
+    <div className="col-12 mb-3" key={index}>
+      <img
+        src={img}
+        alt={`Highlight ${index + 1}`}
+        className="w-100 h-auto object-cover rounded shadow-sm"
+      />
+    </div>
+  ))}
+</div>
+
       ) : (
         <div className="text-muted">No highlights available for this service.</div>
       )}
