@@ -11,7 +11,7 @@ const Hightlight = () => {
   return (
     <div className="mx-2 mx-lg-5 mb-4">
       <hr />
-      <h5 className="fw-bold py-2" style={{ textDecoration: "underline" }}>Highlivgfgfgfgfgfgghts</h5>
+      <h5 className="fw-bold py-2" style={{ textDecoration: "underline" }}>Highlihts</h5>
 
       {Array.isArray(highlights) && highlights.length > 0 ? (
        <div className="row">
