@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button, Col, Container, Row, Spinner } from "react-bootstrap";
-import { FaUserPlus, FaShareAlt } from "react-icons/fa";
+import { FaUserPlus, FaShareAlt, FaShoppingCart } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useService } from "./context/ServiceContext";
 import ProviderSelection from "./ProviderSelection";
@@ -46,10 +46,14 @@ function FAQs() {
         <Container className="mt-5">
           <Row>
             <Col xs={12} md={6} className="my-2">
-              <Button className="border-none py-2 fw-bold send-btn w-100" style={{ backgroundColor: "#00509D" }} onClick={handleShow}>
-                <FaUserPlus className="me-2" />
-                Self Add
-              </Button>
+              <Button
+  className="border-none py-2 fw-bold send-btn w-100"
+  style={{ backgroundColor: "#00509D" }}
+  onClick={handleShow}
+>
+  <FaShoppingCart className="me-2" />
+  Buy Now
+</Button>
             </Col>
             <Col xs={12} md={6} className="my-2">
               <Button className="border-none py-2 px-3 fw-bold send-btn w-100" onClick={() => navigate("/share-to-customer")}>
